@@ -50,6 +50,7 @@
             </pose>
             <inertial>
                 <pose>0 0 0 0 0 0</pose>
+                <xacro_macro name="inertia_cylinder" m="0.0001" r="0.001" l="0.001"/>
             </inertial>
             <visual name="${prefix}_pelvis_rod_visual">
                 <!-- Cylinders are along +z -->
@@ -117,8 +118,12 @@
                 <limit>
                     <lower>${-pi/2}</lower>
                     <upper>${pi/2}</upper>
-                    <effort>10.0</effort>
+                    <effort>1.0</effort>
+                    <velocity>10</velocity>
                 </limit>
+                <dynamics>
+                  <damping>1.5e-2</damping>
+                </dynamics>
             </axis>
         </joint>
         
@@ -152,8 +157,12 @@
                 <limit>
                     <lower>${-pi/2}</lower>
                     <upper>${pi/2}</upper>
-                    <effort>10.0</effort>
+                    <effort>1.0</effort>
+                    <velocity>10</velocity>
                 </limit>
+                <dynamics>
+                  <damping>1.5e-2</damping>
+                </dynamics>
             </axis>
         </joint>
 
@@ -188,8 +197,12 @@
                 <limit>
                     <lower>${-pi}</lower>
                     <upper>${0}</upper>
-                    <effort>10.0</effort>
+                    <effort>1.0</effort>
+                    <velocity>10</velocity>
                 </limit>
+                <dynamics>
+                  <damping>1.5e-2</damping>
+                </dynamics>
                 <initial_position>${-pi/2}</initial_position>
             </axis>
         </joint>

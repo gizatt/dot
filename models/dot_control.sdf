@@ -52,6 +52,15 @@
             </pose>
 			<inertial>
 				<pose>0 0 0 0 0 0</pose>
+				<mass>0.0001</mass>
+				<inertia>
+					<ixx>3.3333333333333335e-11</ixx>
+					<ixy>0</ixy>
+					<ixz>0</ixz>
+					<iyy>3.3333333333333335e-11</iyy>
+					<iyz>0</iyz>
+					<izz>5.000000000000001e-11</izz>
+				</inertia>
 			</inertial>
 			<visual name="left_front_pelvis_rod_visual">
 				<!-- Cylinders are along +z -->
@@ -171,8 +180,12 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>10.0</effort>
+					<effort>1.0</effort>
+					<velocity>10</velocity>
 				</limit>
+				<dynamics>
+					<damping>1.5e-2</damping>
+				</dynamics>
 			</axis>
 		</joint>
 		<!-- hip-->
@@ -239,8 +252,12 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>10.0</effort>
+					<effort>1.0</effort>
+					<velocity>10</velocity>
 				</limit>
+				<dynamics>
+					<damping>1.5e-2</damping>
+				</dynamics>
 			</axis>
 		</joint>
 		<!-- shin-->
@@ -308,8 +325,12 @@
 				<limit>
 					<lower>-3.1415</lower>
 					<upper>0</upper>
-					<effort>10.0</effort>
+					<effort>1.0</effort>
+					<velocity>10</velocity>
 				</limit>
+				<dynamics>
+					<damping>1.5e-2</damping>
+				</dynamics>
 				<initial_position>-1.57075</initial_position>
 			</axis>
 		</joint>
@@ -320,6 +341,15 @@
             </pose>
 			<inertial>
 				<pose>0 0 0 0 0 0</pose>
+				<mass>0.0001</mass>
+				<inertia>
+					<ixx>3.3333333333333335e-11</ixx>
+					<ixy>0</ixy>
+					<ixz>0</ixz>
+					<iyy>3.3333333333333335e-11</iyy>
+					<iyz>0</iyz>
+					<izz>5.000000000000001e-11</izz>
+				</inertia>
 			</inertial>
 			<visual name="right_front_pelvis_rod_visual">
 				<!-- Cylinders are along +z -->
@@ -439,8 +469,12 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>10.0</effort>
+					<effort>1.0</effort>
+					<velocity>10</velocity>
 				</limit>
+				<dynamics>
+					<damping>1.5e-2</damping>
+				</dynamics>
 			</axis>
 		</joint>
 		<!-- hip-->
@@ -507,8 +541,12 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>10.0</effort>
+					<effort>1.0</effort>
+					<velocity>10</velocity>
 				</limit>
+				<dynamics>
+					<damping>1.5e-2</damping>
+				</dynamics>
 			</axis>
 		</joint>
 		<!-- shin-->
@@ -576,8 +614,12 @@
 				<limit>
 					<lower>-3.1415</lower>
 					<upper>0</upper>
-					<effort>10.0</effort>
+					<effort>1.0</effort>
+					<velocity>10</velocity>
 				</limit>
+				<dynamics>
+					<damping>1.5e-2</damping>
+				</dynamics>
 				<initial_position>-1.57075</initial_position>
 			</axis>
 		</joint>
@@ -588,6 +630,15 @@
             </pose>
 			<inertial>
 				<pose>0 0 0 0 0 0</pose>
+				<mass>0.0001</mass>
+				<inertia>
+					<ixx>3.3333333333333335e-11</ixx>
+					<ixy>0</ixy>
+					<ixz>0</ixz>
+					<iyy>3.3333333333333335e-11</iyy>
+					<iyz>0</iyz>
+					<izz>5.000000000000001e-11</izz>
+				</inertia>
 			</inertial>
 			<visual name="left_back_pelvis_rod_visual">
 				<!-- Cylinders are along +z -->
@@ -707,8 +758,12 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>10.0</effort>
+					<effort>1.0</effort>
+					<velocity>10</velocity>
 				</limit>
+				<dynamics>
+					<damping>1.5e-2</damping>
+				</dynamics>
 			</axis>
 		</joint>
 		<!-- hip-->
@@ -775,8 +830,12 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>10.0</effort>
+					<effort>1.0</effort>
+					<velocity>10</velocity>
 				</limit>
+				<dynamics>
+					<damping>1.5e-2</damping>
+				</dynamics>
 			</axis>
 		</joint>
 		<!-- shin-->
@@ -844,8 +903,12 @@
 				<limit>
 					<lower>-3.1415</lower>
 					<upper>0</upper>
-					<effort>10.0</effort>
+					<effort>1.0</effort>
+					<velocity>10</velocity>
 				</limit>
+				<dynamics>
+					<damping>1.5e-2</damping>
+				</dynamics>
 				<initial_position>-1.57075</initial_position>
 			</axis>
 		</joint>
@@ -856,6 +919,15 @@
             </pose>
 			<inertial>
 				<pose>0 0 0 0 0 0</pose>
+				<mass>0.0001</mass>
+				<inertia>
+					<ixx>3.3333333333333335e-11</ixx>
+					<ixy>0</ixy>
+					<ixz>0</ixz>
+					<iyy>3.3333333333333335e-11</iyy>
+					<iyz>0</iyz>
+					<izz>5.000000000000001e-11</izz>
+				</inertia>
 			</inertial>
 			<visual name="right_back_pelvis_rod_visual">
 				<!-- Cylinders are along +z -->
@@ -975,8 +1047,12 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>10.0</effort>
+					<effort>1.0</effort>
+					<velocity>10</velocity>
 				</limit>
+				<dynamics>
+					<damping>1.5e-2</damping>
+				</dynamics>
 			</axis>
 		</joint>
 		<!-- hip-->
@@ -1043,8 +1119,12 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>10.0</effort>
+					<effort>1.0</effort>
+					<velocity>10</velocity>
 				</limit>
+				<dynamics>
+					<damping>1.5e-2</damping>
+				</dynamics>
 			</axis>
 		</joint>
 		<!-- shin-->
@@ -1112,8 +1192,12 @@
 				<limit>
 					<lower>-3.1415</lower>
 					<upper>0</upper>
-					<effort>10.0</effort>
+					<effort>1.0</effort>
+					<velocity>10</velocity>
 				</limit>
+				<dynamics>
+					<damping>1.5e-2</damping>
+				</dynamics>
 				<initial_position>-1.57075</initial_position>
 			</axis>
 		</joint>
