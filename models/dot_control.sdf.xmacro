@@ -1,0 +1,218 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+    <!-- Robot dimensions, all units meters.
+        FORWARD IS +X
+        LEFT IS +Y
+        UP IS +Z -->
+    <xacro_define_property name="pi" value="3.1415" />
+    <xacro_define_property name="com_pos" value="0.0 0.0 0.0" />
+    <xacro_define_property name="body_mass" value="2.0" />
+    <!-- Hip abduction axis forward/back from robot origin -->
+    <xacro_define_property name="forward_pelvis_x" value="0.125" />
+    <xacro_define_property name="rear_pelvis_x" value="-0.125" />
+    <!-- Hip abduction axis y displacement -->
+    <xacro_define_property name="pre_hip_width" value="0.05" />
+    <!-- Hip abduction axis to hip axis -->
+    <xacro_define_property name="hip_x" value="0.01" />
+    <xacro_define_property name="hip_y" value="0.01" />
+    <xacro_define_property name="inner_hip_mass" value="0.1" />
+    <xacro_define_property name="hip_length" value="0.11" />
+    <xacro_define_property name="hip_mass" value="0.05" />
+    <!-- Knee info -->
+    <xacro_define_property name="knee_y" value="0.01" />
+    <xacro_define_property name="shin_length" value="0.11"/>
+    <xacro_define_property name="shin_mass" value="0.05"/>
+
+    <xacro_define_macro name="color" params="color">
+        <material>
+            <ambient>${color}</ambient>
+            <diffuse>${color}</diffuse>
+        </material>
+    </xacro_define_macro>
+
+    <xacro_define_macro name="vis_and_col_ball" params="prefix r color pose">
+        <visual name="${prefix}_vis">
+            <pose>${pose}</pose>
+            <xacro_macro name="geometry_sphere" r="${r}"/>
+            <xacro_macro name="color" color="${color}"/>
+        </visual>
+        <collision name="${prefix}_vis">
+            <pose>${pose}</pose>
+            <xacro_macro name="geometry_sphere" r="${r}"/>
+        </collision>
+    </xacro_define_macro>
+
+    <xacro_define_macro name = "make_leg" params="prefix x sign color">
+        <!-- Pelvis -->
+        <link name="${prefix}_pelvis">
+            <pose relative_to="body">
+                ${x} 0 0 0 0 0
+            </pose>
+            <inertial>
+                <pose>0 0 0 0 0 0</pose>
+            </inertial>
+            <visual name="${prefix}_pelvis_rod_visual">
+                <!-- Cylinders are along +z -->
+                <pose> 0 ${sign * pre_hip_width/2} 0 ${pi/2.} 0 0 </pose>
+                <xacro_macro name="geometry_cylinder" r="0.005" l="${pre_hip_width}"/>
+                <xacro_macro name="color" color="${color}"/>
+            </visual>
+            <visual name="${prefix}_pelvis_ball_visual">
+                <pose>0 ${sign * pre_hip_width} 0 0 0 0 </pose>
+                <xacro_macro name="geometry_sphere" r="0.01"/>
+                <xacro_macro name="color" color="${color}"/>
+            </visual>
+        </link>
+        <joint name="${prefix}_body2pelvis" type="fixed">
+            <parent>body</parent>
+            <child>${prefix}_pelvis</child>
+            <pose relative_to="body">
+                ${x} 0 0 0 0 0
+            </pose>
+        </joint>
+
+        <!-- hip abduction-->
+        <link name="${prefix}_hip_inner">
+            <pose relative_to="${prefix}_pelvis">
+                0 ${sign*pre_hip_width} 0 0 0 0
+            </pose>
+            <inertial>
+                <!-- Guessing the massive servos pull the COM to right between them -->
+                <pose>${-hip_x} ${sign * hip_y} 0 0 0 0</pose>
+                <!-- approx standin inertia -->
+                <xacro_macro name="inertia_cylinder" m="${inner_hip_mass}" r="0.0025" l="${hip_x}"/>
+                <mass>${inner_hip_mass}</mass>
+            </inertial>
+            <visual name="${prefix}_inner_hip_rod_x_visual">
+                <!-- Cylinders are along +z -->
+                <pose> ${hip_x}/2 0 0 0 ${pi/2.} 0 </pose>
+                <xacro_macro name="geometry_cylinder" r="0.0025" l="${hip_x}"/>
+                <xacro_macro name="color" color="${color}"/>
+            </visual>
+            <visual name="${prefix}_inner_hip_rod_y_visual">
+                <!-- Cylinders are along +z -->
+                <pose> ${hip_x} ${sign*hip_y/2} 0 ${pi/2.} 0 0 </pose>
+                <xacro_macro name="geometry_cylinder" r="0.0025" l="${hip_y}"/>
+                <xacro_macro name="color" color="${color}"/>
+            </visual>
+            <visual name="${prefix}_inner_hip_ball_visual">
+                <pose>${hip_x} ${sign*hip_y} 0 0 0 0 </pose>
+                <xacro_macro name="geometry_sphere" r="0.01"/>
+                <xacro_macro name="color" color="${color}"/>
+            </visual>
+            <visual name="${prefix}_inner_hip_box_visual">
+                <pose>${hip_x/2} ${sign*hip_y/2} 0 0 0 0</pose>
+                <xacro_macro name="geometry_box" x="0.04" y="0.04" z="0.04"/>
+                <xacro_macro name="color" color="${color}"/>
+            </visual>
+        </link>
+        <joint name="${prefix}_hip_roll" type="revolute">
+            <parent>${prefix}_pelvis</parent>
+            <child>${prefix}_hip_inner</child>
+            <pose relative_to="${prefix}_pelvis">
+                0 ${sign*pre_hip_width} 0. 0. 0. 0
+            </pose>
+            <axis>
+                <xyz>1. 0. 0.</xyz>
+                <limit>
+                    <lower>${-pi/2}</lower>
+                    <upper>${pi/2}</upper>
+                    <effort>10.0</effort>
+                </limit>
+            </axis>
+        </joint>
+        
+        <!-- hip-->
+        <link name="${prefix}_hip">
+            <!-- Goes straight down at base posture -->
+            <pose relative_to="${prefix}_hip_inner">
+                ${hip_x} ${sign * hip_y} 0 0 0 0
+            </pose>
+
+            <inertial>
+                <pose>0 0 ${-hip_length/2} 0 0 0</pose>
+                <xacro_macro name="inertia_cylinder" m="${hip_mass}" r="0.0025" l="${hip_length}"/>
+            </inertial>
+            <visual name="${prefix}_hip_rod_visual">
+                <!-- Cylinders are along +z -->
+                <pose> 0 0 ${-hip_length/2.} 0 0 0 </pose>
+                <xacro_macro name="geometry_cylinder" r="0.0025" l="${hip_length}"/>
+                <xacro_macro name="color" color="${color}"/>
+            </visual>
+            <xacro_macro name="vis_and_col_ball" prefix="${prefix}_hip_ball" color="${color}" pose="0 0 ${-hip_length} 0. 0. 0." r="0.01"/>
+        </link>
+        <joint name="${prefix}_hip_pitch" type="revolute">
+            <parent>${prefix}_hip_inner</parent>
+            <child>${prefix}_hip</child>
+            <pose relative_to="${prefix}_hip_inner">
+                ${hip_x} ${sign * hip_y} 0 0 0 0
+            </pose>
+            <axis>
+                <xyz>0. 1. 0.</xyz>
+                <limit>
+                    <lower>${-pi/2}</lower>
+                    <upper>${pi/2}</upper>
+                    <effort>10.0</effort>
+                </limit>
+            </axis>
+        </joint>
+
+        <!-- shin-->
+        <link name="${prefix}_shin">
+            <!-- Points straight down at angle=0 -->
+            <pose relative_to="${prefix}_hip">
+                0 ${sign * knee_y} ${-hip_length} 0 0 0
+            </pose>
+
+            <inertial>
+                <pose>0 0 ${-shin_length/2} 0 0 0</pose>
+                <xacro_macro name="inertia_cylinder" m="${shin_mass}" r="0.0025" l="${shin_length}"/>
+            </inertial>
+            <visual name="${prefix}_hip_rod_visual">
+                <!-- Cylinders are along +z -->
+                <pose> 0 0 ${-shin_length/2.} 0 0 0 </pose>
+                <xacro_macro name="geometry_cylinder" r="0.0025" l="${shin_length}"/>
+                <xacro_macro name="color" color="${color}"/>
+            </visual>
+            <xacro_macro name="vis_and_col_ball" prefix="${prefix}_shin_ball" color="${color}" pose="0 0 ${-shin_length} 0. 0. 0." r="0.01"/>
+        </link>
+        <joint name="${prefix}_knee_pitch" type="revolute">
+            <parent>${prefix}_hip</parent>
+            <child>${prefix}_shin</child>
+            <pose relative_to="${prefix}_hip">
+                0 ${sign * knee_y} ${-hip_length} 0 0 0
+            </pose>
+            <axis>
+                <!-- axis is in child frame -->
+                <xyz>0 1. 0</xyz>
+                <limit>
+                    <lower>${-pi}</lower>
+                    <upper>${0}</upper>
+                    <effort>10.0</effort>
+                </limit>
+                <initial_position>${-pi/2}</initial_position>
+            </axis>
+        </joint>
+
+    </xacro_define_macro>
+
+    <model name='dot'>
+        <link name="body">
+            <inertial>
+                <pose>0 0 0 0 0 0</pose>
+                <xacro_macro name="inertia_box" m="${body_mass}" x="0.3" y="0.1" z="0.05"/>
+            </inertial>
+            <visual name="body_visual">
+                <xacro_macro name="geometry_box" x="0.3" y="0.1" z="0.05"/>
+                <xacro_macro name="color" color="1. 0.8 0.6 1.0"/>
+            </visual>
+            <collision name="body_collision">
+                <xacro_macro name="geometry_box" x="0.3" y="0.1" z="0.05"/>
+            </collision>
+        </link>
+        <xacro_macro name="make_leg" prefix="left_front" x="${forward_pelvis_x}" sign="1." color="1. 0.5 0.25 1."/>
+        <xacro_macro name="make_leg" prefix="right_front" x="${forward_pelvis_x}" sign="-1." color="1. 0.25 0.5 1."/>
+        <xacro_macro name="make_leg" prefix="left_back" x="${rear_pelvis_x}" sign="1." color="0.25 1.0 0.5 1.0"/>
+        <xacro_macro name="make_leg" prefix="right_back" x="${rear_pelvis_x}" sign="-1." color="0.5 1.0 0.25 1.0"/>-->
+    </model>
+</sdf>
