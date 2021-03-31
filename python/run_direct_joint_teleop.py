@@ -86,6 +86,11 @@ def main():
     MeshcatVisualizer.add_argparse_argument(parser)
     args = parser.parse_args()
 
+    q_init = np.array([0.25, np.pi/4, -np.pi/2.,
+             -0.25, np.pi/4, -np.pi/2.,
+             0.25, np.pi/4, -np.pi/2.,
+             -0.25, np.pi/4, -np.pi/2.])
+
     builder = DiagramBuilder()
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, 0.0005)
     parser = Parser(plant)
@@ -106,6 +111,7 @@ def main():
     if args.interactive:
         # Add sliders to set positions of the joints.
         sliders = builder.AddSystem(JointSliders(robot=plant))
+        sliders.set_joint_position(q_init)
         builder.Connect(sliders.get_output_port(0), controller.get_input_port(0))
     else:
         source = builder.AddSystem(ConstantVectorSource(np.zeros(controller.nu)))
