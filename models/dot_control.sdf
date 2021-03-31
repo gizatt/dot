@@ -180,7 +180,7 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>1.0</effort>
+					<effort>10.0</effort>
 					<velocity>10</velocity>
 				</limit>
 				<dynamics>
@@ -252,7 +252,7 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>1.0</effort>
+					<effort>10.0</effort>
 					<velocity>10</velocity>
 				</limit>
 				<dynamics>
@@ -325,7 +325,7 @@
 				<limit>
 					<lower>-3.1415</lower>
 					<upper>0</upper>
-					<effort>1.0</effort>
+					<effort>10.0</effort>
 					<velocity>10</velocity>
 				</limit>
 				<dynamics>
@@ -469,7 +469,7 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>1.0</effort>
+					<effort>10.0</effort>
 					<velocity>10</velocity>
 				</limit>
 				<dynamics>
@@ -541,7 +541,7 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>1.0</effort>
+					<effort>10.0</effort>
 					<velocity>10</velocity>
 				</limit>
 				<dynamics>
@@ -614,7 +614,7 @@
 				<limit>
 					<lower>-3.1415</lower>
 					<upper>0</upper>
-					<effort>1.0</effort>
+					<effort>10.0</effort>
 					<velocity>10</velocity>
 				</limit>
 				<dynamics>
@@ -758,7 +758,7 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>1.0</effort>
+					<effort>10.0</effort>
 					<velocity>10</velocity>
 				</limit>
 				<dynamics>
@@ -830,7 +830,7 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>1.0</effort>
+					<effort>10.0</effort>
 					<velocity>10</velocity>
 				</limit>
 				<dynamics>
@@ -903,7 +903,7 @@
 				<limit>
 					<lower>-3.1415</lower>
 					<upper>0</upper>
-					<effort>1.0</effort>
+					<effort>10.0</effort>
 					<velocity>10</velocity>
 				</limit>
 				<dynamics>
@@ -1047,7 +1047,7 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>1.0</effort>
+					<effort>10.0</effort>
 					<velocity>10</velocity>
 				</limit>
 				<dynamics>
@@ -1119,7 +1119,7 @@
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
-					<effort>1.0</effort>
+					<effort>10.0</effort>
 					<velocity>10</velocity>
 				</limit>
 				<dynamics>
@@ -1192,7 +1192,7 @@
 				<limit>
 					<lower>-3.1415</lower>
 					<upper>0</upper>
-					<effort>1.0</effort>
+					<effort>10.0</effort>
 					<velocity>10</velocity>
 				</limit>
 				<dynamics>

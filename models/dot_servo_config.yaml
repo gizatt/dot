@@ -1,0 +1,129 @@
+sdf_path: "dot_control.sdf"
+
+left_front:
+  hip_roll:
+    joint_name: "left_front_hip_roll"
+    # microseconds
+    pwm_range: [500, 2500]
+    # corresponding actual angle of servo horn
+    angle_range: [-90., 90.]
+    # kg-cm
+    torque_limit: 20
+    # sec per 60 degrees
+    speed_limit: 0.11
+  hip_pitch: 
+    joint_name: "left_front_hip_pitch"
+    # microseconds
+    pwm_range: [500, 2500]
+    # corresponding actual angle of servo horn
+    angle_range: [-90., 90.]
+    # kg-cm
+    torque_limit: 20
+    # sec per 60 degrees
+    speed_limit: 0.11
+  knee_pitch: 
+    joint_name: "left_front_knee_pitch"
+    # microseconds
+    pwm_range: [500, 2500]
+    # corresponding angles of servo
+    angle_range: [-180., 0.]
+    # kg-cm
+    torque_limit: 20          
+    # sec per 60 degrees
+    speed_limit: 0.11
+
+right_front:
+  hip_roll:
+    joint_name: "right_front_hip_roll"
+    # microseconds
+    pwm_range: [500, 2500]
+    # corresponding actual angle of servo horn
+    angle_range: [-90., 90.]
+    # kg-cm
+    torque_limit: 20
+    # sec per 60 degrees
+    speed_limit: 0.11
+  hip_pitch: 
+    joint_name: "right_front_hip_pitch"
+    # microseconds
+    pwm_range: [500, 2500]
+    # corresponding actual angle of servo horn
+    angle_range: [-90., 90.]
+    # kg-cm
+    torque_limit: 20
+    # sec per 60 degrees
+    speed_limit: 0.11
+  knee_pitch: 
+    joint_name: "right_front_knee_pitch"
+    # microseconds
+    pwm_range: [500, 2500]
+    # corresponding angles of servo
+    angle_range: [-180., 00.]
+    # kg-cm
+    torque_limit: 20          
+    # sec per 60 degrees
+    speed_limit: 0.11
+
+left_back:
+  hip_roll:
+    joint_name: "left_back_hip_roll"
+    # microseconds
+    pwm_range: [500, 2500]
+    # corresponding actual angle of servo horn
+    angle_range: [-90., 90.]
+    # kg-cm
+    torque_limit: 20
+    # sec per 60 degrees
+    speed_limit: 0.11
+  hip_pitch: 
+    joint_name: "left_back_hip_pitch"
+    # microseconds
+    pwm_range: [500, 2500]
+    # corresponding actual angle of servo horn
+    angle_range: [-90., 90.]
+    # kg-cm
+    torque_limit: 20
+    # sec per 60 degrees
+    speed_limit: 0.11
+  knee_pitch: 
+    joint_name: "left_back_knee_pitch"
+    # microseconds
+    pwm_range: [500, 2500]
+    # corresponding angles of servo
+    angle_range: [-180., 0.]
+    # kg-cm
+    torque_limit: 20          
+    # sec per 60 degrees
+    speed_limit: 0.11
+
+right_back:
+  hip_roll:
+    joint_name: "right_back_hip_roll"
+    # microseconds
+    pwm_range: [500, 2500]
+    # corresponding actual angle of servo horn
+    angle_range: [-90., 90.]
+    # kg-cm
+    torque_limit: 20
+    # sec per 60 degrees
+    speed_limit: 0.11
+  hip_pitch: 
+    joint_name: "right_back_hip_pitch"
+    # microseconds
+    pwm_range: [500, 2500]
+    # corresponding actual angle of servo horn
+    angle_range: [-90., 90.]
+    # kg-cm
+    torque_limit: 20
+    # sec per 60 degrees
+    speed_limit: 0.11
+  knee_pitch: 
+    joint_name: "right_back_knee_pitch"
+    # microseconds
+    pwm_range: [500, 2500]
+    # corresponding angles of servo
+    angle_range: [-180., 00.]
+    # kg-cm
+    torque_limit: 20          
+    # sec per 60 degrees
+    speed_limit: 0.11

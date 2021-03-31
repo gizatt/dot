@@ -25,7 +25,7 @@ from pydrake.all import (
     Simulator
 )
 
-from drake_dot_sim import setup_dot_diagram, setup_argparse_for_setup_dot_diagram
+from drake_dot_sim import setup_dot_diagram, setup_argparse_for_setup_dot_diagram, ServoSliders
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -34,10 +34,10 @@ def main():
     MeshcatVisualizer.add_argparse_argument(parser)
     args = parser.parse_args()
 
-    q_init = np.array([0.25, np.pi/4, -np.pi/2.,
-             -0.25, np.pi/4, -np.pi/2.,
-             0.25, np.pi/4, -np.pi/2.,
-             -0.25, np.pi/4, -np.pi/2.])
+    q_init = np.array([1700, 2000, 2000,
+                       1700, 2000, 2000,
+                    1300, 2000, 2000,
+                    1300, 2000, 2000])
 
     builder = DiagramBuilder()
     plant, scene_graph, servo_controller = setup_dot_diagram(
@@ -45,8 +45,8 @@ def main():
     
     if args.interactive:
         # Add sliders to set positions of the joints.
-        sliders = builder.AddSystem(JointSliders(robot=plant))
-        sliders.set_joint_position(q_init)
+        sliders = builder.AddSystem(ServoSliders(servo_controller))
+        sliders.set_position(q_init)
         builder.Connect(sliders.get_output_port(0), servo_controller.get_input_port(0))
     else:
         source = builder.AddSystem(ConstantVectorSource(np.zeros(servo_controller.nu)))
