@@ -8,16 +8,25 @@ import sys
 
 import numpy as np
 
-from pydrake.geometry import DrakeVisualizer
-from pydrake.math import RigidTransform, RotationMatrix
-from pydrake.systems.framework import DiagramBuilder
-from pydrake.systems.analysis import Simulator
-from pydrake.systems.meshcat_visualizer import MeshcatVisualizer
-from pydrake.systems.primitives import FirstOrderLowPassFilter, SignalLogger
 from pydrake.all import (
     AddMultibodyPlantSceneGraph,
-    MultibodyPlant, SceneGraph, Parser, FindResourceOrThrow, ConnectMeshcatVisualizer, JointSliders,
-    LeafSystem, BasicVector, ConstantVectorSource, MultibodyForces, RigidTransform, SpatialInertia, UnitInertia, Box, CoulombFriction
+    BasicVector,
+    Box,
+    ConnectMeshcatVisualizer,
+    ConstantVectorSource,
+    CoulombFriction,
+    DiagramBuilder,
+    JointSliders,
+    LeafSystem,
+    MeshcatVisualizer,
+    MultibodyForces,
+    MultibodyPlant,
+    Parser,
+    RigidTransform,
+    SceneGraph,
+    Simulator,
+    SpatialInertia,
+    UnitInertia,
 )
 
 class ServoController(LeafSystem):
