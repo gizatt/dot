@@ -96,7 +96,7 @@ class ServoController(LeafSystem):
         self.Kp_for_torque = 100.
         # In this deadzone, direction position PD is applied, which is more
         # stable for contacts / holding position.
-        self.angle_deadzone = 25.0 * np.pi/180.
+        self.angle_deadzone = 10.0 * np.pi/180.
         self.deadzone_Kp = 10.
         self.deadzone_Kd = 1.
         
@@ -259,6 +259,23 @@ class ServoSliders(VectorSystem):
         for i in range(0, len(self._slider)):
             output[i] = self._slider[i].get()
 
+
+class TrajectoryLooper(LeafSystem):
+    def __init__(self, trajectory):
+        LeafSystem.__init__(self)
+        self.trajectory = trajectory
+        self.DeclareVectorOutputPort(
+            "setpoint",
+            BasicVector(self.trajectory.rows()),
+            self.CalcOutput
+        )
+
+    def CalcOutput(self, context, output):
+        t = context.get_time()
+        looped_t = np.mod(t, self.trajectory.end_time())
+        output.SetFromVector(self.trajectory.value(looped_t))
+
+
 def add_ground(plant):
     ground_model = plant.AddModelInstance("ground_model")
     ground_box = plant.AddRigidBody(
@@ -276,6 +293,7 @@ def add_ground(plant):
 def setup_argparse_for_setup_dot_diagram(parser):
     parser.add_argument("--yaml_path", help="path to yaml config", default="../models/dot_servo_config.yaml")
     parser.add_argument("--welded", action='store_true')
+
 
 def setup_dot_diagram(builder, args):
     ''' Using an existing DiagramBuilder, adds a sim of the Dot
@@ -306,3 +324,4 @@ def setup_dot_diagram(builder, args):
     builder.Connect(zoh.get_output_port(0), filter.get_input_port(0))
     builder.Connect(filter.get_output_port(0), plant.get_actuation_input_port())
     return plant, scene_graph, controller
+

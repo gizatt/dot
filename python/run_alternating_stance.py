@@ -20,30 +20,28 @@ from drake_dot_sim import setup_dot_diagram, setup_argparse_for_setup_dot_diagra
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("-t1", default=0.05, help="Extend leg")
-    parser.add_argument("-t2", default=0.5, help="Dwell at top")
-    parser.add_argument("-t3", default=0.5, help="Contract leg")
-    parser.add_argument("-t4", default=0.1, help="Wait at bottom")
+    parser.add_argument("-t1", default=0.01, help="Extend time")
+    parser.add_argument("-t2", default=0.1, help="Hold time")
     setup_argparse_for_setup_dot_diagram(parser)
     MeshcatVisualizer.add_argparse_argument(parser)
     args = parser.parse_args()
+
     t1 = float(args.t1)
     t2 = float(args.t2)
-    t3 = float(args.t3)
-    t4 = float(args.t4)
-    
-    q_crouch = np.array([1600, 2100, 2000,
+
+    q_stance_1 = np.array([1600, 2250, 1600,
                          1600, 2100, 2000,
                          1400, 2100, 2000,
+                         1400, 2250, 1600])
+
+
+    q_stance_2 = np.array([1600, 2100, 2000,
+                         1600, 2250, 1600,
+                         1400, 2250, 1600,
                          1400, 2100, 2000])
 
-    q_extend = np.array([1600, 1600, 2400,
-                         1600, 1600, 2400,
-                         1400, 1600, 2400,
-                         1400, 1600, 2400])
-
-    breaks = np.cumsum([0., t1, t2, t3, t4])
-    samples = np.stack([q_crouch, q_extend, q_extend, q_crouch, q_crouch]).T
+    breaks = np.cumsum([0., t1, t2, t1, t2])
+    samples = np.stack([q_stance_1, q_stance_2, q_stance_2, q_stance_1, q_stance_1]).T
     trajectory = PiecewisePolynomial.FirstOrderHold(breaks, samples)
 
     builder = DiagramBuilder()
