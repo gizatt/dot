@@ -48,7 +48,7 @@
 		<!-- Pelvis -->
 		<link name="left_front_pelvis">
 			<pose relative_to="body">
-                0.125 0 0 0 0 0
+                0.2 0 0 0 0 0
             </pose>
 			<inertial>
 				<pose>0 0 0 0 0 0</pose>
@@ -64,11 +64,11 @@
 			</inertial>
 			<visual name="left_front_pelvis_rod_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0 0.025 0 1.57075 0 0 </pose>
+				<pose> 0 0.05 0 1.57075 0 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.005</radius>
-						<length>0.05</length>
+						<length>0.1</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -77,7 +77,7 @@
 				</material>
 			</visual>
 			<visual name="left_front_pelvis_ball_visual">
-				<pose>0 0.05 0 0 0 0 </pose>
+				<pose>0 0.1 0 0 0 0 </pose>
 				<geometry>
 					<sphere>
 						<radius>0.01</radius>
@@ -93,13 +93,13 @@
 			<parent>body</parent>
 			<child>left_front_pelvis</child>
 			<pose relative_to="body">
-                0.125 0 0 0 0 0
+                0.2 0 0 0 0 0
             </pose>
 		</joint>
 		<!-- hip abduction-->
 		<link name="left_front_hip_inner">
 			<pose relative_to="left_front_pelvis">
-                0 0.05 0 0 0 0
+                0 0.1 0 0 0 0
             </pose>
 			<inertial>
 				<!-- Guessing the massive servos pull the COM to right between them -->
@@ -173,7 +173,7 @@
 			<parent>left_front_pelvis</parent>
 			<child>left_front_hip_inner</child>
 			<pose relative_to="left_front_pelvis">
-                0 0.05 0. 0. 0. 0
+                0 0.1 0. 0. 0. 0
             </pose>
 			<axis>
 				<xyz>1. 0. 0.</xyz>
@@ -337,7 +337,7 @@
 		<!-- Pelvis -->
 		<link name="right_front_pelvis">
 			<pose relative_to="body">
-                0.125 0 0 0 0 0
+                0.2 0 0 0 0 0
             </pose>
 			<inertial>
 				<pose>0 0 0 0 0 0</pose>
@@ -353,11 +353,11 @@
 			</inertial>
 			<visual name="right_front_pelvis_rod_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0 -0.025 0 1.57075 0 0 </pose>
+				<pose> 0 -0.05 0 1.57075 0 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.005</radius>
-						<length>0.05</length>
+						<length>0.1</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -366,7 +366,7 @@
 				</material>
 			</visual>
 			<visual name="right_front_pelvis_ball_visual">
-				<pose>0 -0.05 0 0 0 0 </pose>
+				<pose>0 -0.1 0 0 0 0 </pose>
 				<geometry>
 					<sphere>
 						<radius>0.01</radius>
@@ -382,13 +382,13 @@
 			<parent>body</parent>
 			<child>right_front_pelvis</child>
 			<pose relative_to="body">
-                0.125 0 0 0 0 0
+                0.2 0 0 0 0 0
             </pose>
 		</joint>
 		<!-- hip abduction-->
 		<link name="right_front_hip_inner">
 			<pose relative_to="right_front_pelvis">
-                0 -0.05 0 0 0 0
+                0 -0.1 0 0 0 0
             </pose>
 			<inertial>
 				<!-- Guessing the massive servos pull the COM to right between them -->
@@ -462,7 +462,7 @@
 			<parent>right_front_pelvis</parent>
 			<child>right_front_hip_inner</child>
 			<pose relative_to="right_front_pelvis">
-                0 -0.05 0. 0. 0. 0
+                0 -0.1 0. 0. 0. 0
             </pose>
 			<axis>
 				<xyz>1. 0. 0.</xyz>
@@ -626,7 +626,7 @@
 		<!-- Pelvis -->
 		<link name="left_back_pelvis">
 			<pose relative_to="body">
-                -0.125 0 0 0 0 0
+                -0.2 0 0 0 0 0
             </pose>
 			<inertial>
 				<pose>0 0 0 0 0 0</pose>
@@ -642,11 +642,11 @@
 			</inertial>
 			<visual name="left_back_pelvis_rod_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0 0.025 0 1.57075 0 0 </pose>
+				<pose> 0 0.05 0 1.57075 0 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.005</radius>
-						<length>0.05</length>
+						<length>0.1</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -655,7 +655,7 @@
 				</material>
 			</visual>
 			<visual name="left_back_pelvis_ball_visual">
-				<pose>0 0.05 0 0 0 0 </pose>
+				<pose>0 0.1 0 0 0 0 </pose>
 				<geometry>
 					<sphere>
 						<radius>0.01</radius>
@@ -671,13 +671,13 @@
 			<parent>body</parent>
 			<child>left_back_pelvis</child>
 			<pose relative_to="body">
-                -0.125 0 0 0 0 0
+                -0.2 0 0 0 0 0
             </pose>
 		</joint>
 		<!-- hip abduction-->
 		<link name="left_back_hip_inner">
 			<pose relative_to="left_back_pelvis">
-                0 0.05 0 0 0 0
+                0 0.1 0 0 0 0
             </pose>
 			<inertial>
 				<!-- Guessing the massive servos pull the COM to right between them -->
@@ -751,7 +751,7 @@
 			<parent>left_back_pelvis</parent>
 			<child>left_back_hip_inner</child>
 			<pose relative_to="left_back_pelvis">
-                0 0.05 0. 0. 0. 0
+                0 0.1 0. 0. 0. 0
             </pose>
 			<axis>
 				<xyz>1. 0. 0.</xyz>
@@ -915,7 +915,7 @@
 		<!-- Pelvis -->
 		<link name="right_back_pelvis">
 			<pose relative_to="body">
-                -0.125 0 0 0 0 0
+                -0.2 0 0 0 0 0
             </pose>
 			<inertial>
 				<pose>0 0 0 0 0 0</pose>
@@ -931,11 +931,11 @@
 			</inertial>
 			<visual name="right_back_pelvis_rod_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0 -0.025 0 1.57075 0 0 </pose>
+				<pose> 0 -0.05 0 1.57075 0 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.005</radius>
-						<length>0.05</length>
+						<length>0.1</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -944,7 +944,7 @@
 				</material>
 			</visual>
 			<visual name="right_back_pelvis_ball_visual">
-				<pose>0 -0.05 0 0 0 0 </pose>
+				<pose>0 -0.1 0 0 0 0 </pose>
 				<geometry>
 					<sphere>
 						<radius>0.01</radius>
@@ -960,13 +960,13 @@
 			<parent>body</parent>
 			<child>right_back_pelvis</child>
 			<pose relative_to="body">
-                -0.125 0 0 0 0 0
+                -0.2 0 0 0 0 0
             </pose>
 		</joint>
 		<!-- hip abduction-->
 		<link name="right_back_hip_inner">
 			<pose relative_to="right_back_pelvis">
-                0 -0.05 0 0 0 0
+                0 -0.1 0 0 0 0
             </pose>
 			<inertial>
 				<!-- Guessing the massive servos pull the COM to right between them -->
@@ -1040,7 +1040,7 @@
 			<parent>right_back_pelvis</parent>
 			<child>right_back_hip_inner</child>
 			<pose relative_to="right_back_pelvis">
-                0 -0.05 0. 0. 0. 0
+                0 -0.1 0. 0. 0. 0
             </pose>
 			<axis>
 				<xyz>1. 0. 0.</xyz>

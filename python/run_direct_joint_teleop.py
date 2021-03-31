@@ -9,19 +9,10 @@ import sys
 import numpy as np
 
 from pydrake.all import (
-    AddMultibodyPlantSceneGraph,
-    BasicVector,
     ConnectMeshcatVisualizer,
     ConstantVectorSource,
     DiagramBuilder,
-    JointSliders,
-    LeafSystem,
     MeshcatVisualizer,
-    MultibodyForces,
-    MultibodyPlant,
-    Parser,
-    RigidTransform,
-    SceneGraph,
     Simulator
 )
 

@@ -8,10 +8,10 @@
     <xacro_define_property name="com_pos" value="0.0 0.0 0.0" />
     <xacro_define_property name="body_mass" value="2.0" />
     <!-- Hip abduction axis forward/back from robot origin -->
-    <xacro_define_property name="forward_pelvis_x" value="0.125" />
-    <xacro_define_property name="rear_pelvis_x" value="-0.125" />
+    <xacro_define_property name="forward_pelvis_x" value="0.2" />
+    <xacro_define_property name="rear_pelvis_x" value="-0.2" />
     <!-- Hip abduction axis y displacement -->
-    <xacro_define_property name="pre_hip_width" value="0.05" />
+    <xacro_define_property name="pre_hip_width" value="0.1" />
     <!-- Hip abduction axis to hip axis -->
     <xacro_define_property name="hip_x" value="0.01" />
     <xacro_define_property name="hip_y" value="0.01" />

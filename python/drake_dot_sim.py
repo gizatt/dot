@@ -15,6 +15,7 @@ from pydrake.all import (
     BasicVector,
     Box,
     CoulombFriction,
+    FirstOrderLowPassFilter,
     LeafSystem,
     MultibodyForces,
     MultibodyPlant,
@@ -24,9 +25,12 @@ from pydrake.all import (
     Simulator,
     SpatialInertia,
     UnitInertia,
-    VectorSystem
+    VectorSystem,
+    ZeroOrderHold
 )
 
+def sigmoid(x):
+  return 1 / (1 + np.exp(-x))
 
 class ServoController(LeafSystem):
     ''' Simulates control of a set of servos: translates from PWM signals
@@ -45,10 +49,6 @@ class ServoController(LeafSystem):
         self.nu = plant.num_actuated_dofs()
         self.nq = plant.num_positions()
         self.nv = plant.num_velocities()
-
-        # Servo simulator PD gains.
-        self.Kp = 10.
-        self.Kd = self.Kp * 0.01
 
         # Build up a vectorized servo processing pipeline.
         # From a PWM input vector, transform to an angle using the calibration
@@ -90,6 +90,17 @@ class ServoController(LeafSystem):
         self.speed_limits = np.array(speed_limits)
         self.torque_limits = np.array(torque_limits)
         self.n_servos = len(self.pwm_to_angle_center)
+
+        # Servo simulator PD gains.
+        self.Kp_for_vel_target = 100.
+        self.Kp_for_torque = 100.
+        # In this deadzone, direction position PD is applied, which is more
+        # stable for contacts / holding position.
+        self.angle_deadzone = 25.0 * np.pi/180.
+        self.deadzone_Kp = 10.
+        self.deadzone_Kd = 1.
+        
+        
 
         # Build linear map from the current robot position and velocity vectors to the
         # corresponding servo position. (This takes the four bar linkage
@@ -135,6 +146,7 @@ class ServoController(LeafSystem):
 
         self.DeclareVectorInputPort("pwm_setpoints", BasicVector(self.n_servos))
         self.DeclareVectorInputPort("x", BasicVector(self.nq + self.nv))
+
         # Produce a driving torque on the joint to strictly enforce
         # underlying servo positions, down to torque limits.
         self.DeclareVectorOutputPort("torque", BasicVector(self.nu),
@@ -147,19 +159,24 @@ class ServoController(LeafSystem):
         self.plant.SetPositionsAndVelocities(self.plant_context, x_curr)
 
         servo_setpoints = self.get_input_port(0).Eval(context)
-        servo_angles = self.pwm_to_angle_scale * servo_setpoints + self.pwm_to_angle_center
+        servo_angle_setpoints = self.pwm_to_angle_scale * servo_setpoints + self.pwm_to_angle_center
         
         servo_angles_curr = self.q_to_servo_angles_A.dot(q_curr)
         servo_velocities_curr = self.v_to_servo_velocities_A.dot(v_curr)
 
-        servo_torques = self.Kp * (servo_angles - servo_angles_curr) + \
-                        self.Kd * (-servo_velocities_curr)
+        # Weird proportional velocity control
+        velocity_target = self.Kp_for_vel_target * (servo_angle_setpoints - servo_angles_curr)
+        velocity_target = np.clip(velocity_target, -self.speed_limits, self.speed_limits)
+        servo_torques = self.Kp_for_torque * (velocity_target - servo_velocities_curr)
+        
+        # Deadzone control
+        servo_torques_deadzone = self.deadzone_Kp * (servo_angle_setpoints - servo_angles_curr) + \
+                        self.deadzone_Kd * (-servo_velocities_curr)
+        deadzone_mask = np.abs(servo_angle_setpoints - servo_angles_curr) <= self.angle_deadzone
+        servo_torques[deadzone_mask] = servo_torques_deadzone[deadzone_mask]
 
-        # Apply speed limit -- block torque beyond speed limit.
-        servo_torques[np.abs(servo_velocities_curr) > self.speed_limits] = 0.
-        # Apply torque limit.
+        # Limit and map torques back to actuation inputs.
         servo_torques = np.clip(servo_torques, -self.torque_limits, self.torque_limits)
-        # Map torques back to actuation inputs.
         out_actuation = self.servos_to_actuator_map.dot(servo_torques)
         output.SetFromVector(out_actuation)
 
@@ -250,7 +267,7 @@ def add_ground(plant):
     X_WG = RigidTransform([0, 0, -0.05])
     ground_geometry_id = plant.RegisterCollisionGeometry(
         ground_box, RigidTransform(), Box(10, 10, 0.1), "ground",
-        CoulombFriction(0.1, 0.05))
+        CoulombFriction(0.3, 0.25))
     plant.RegisterVisualGeometry(
         ground_box, RigidTransform(), Box(10, 10, 0.1), "ground",
         [0.5, 0.5, 0.5, 1.])
@@ -273,7 +290,7 @@ def setup_dot_diagram(builder, args):
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, 0.0005)
     parser = Parser(plant)
     model = parser.AddModelFromFile(sdf_path)
-    plant.SetDefaultFreeBodyPose(plant.GetBodyByName("body"), RigidTransform(p=[0., 0., 0.5]))
+    plant.SetDefaultFreeBodyPose(plant.GetBodyByName("body"), RigidTransform(p=[0., 0., 0.25]))
     if args.welded:
         plant.WeldFrames(plant.world_frame(), plant.GetBodyByName("body").body_frame())
     else:
@@ -281,6 +298,11 @@ def setup_dot_diagram(builder, args):
     plant.Finalize()
 
     controller = builder.AddSystem(ServoController(plant, config_dict))
+    # Fixed control-rate controller with a low pass filter on its torque output.
+    zoh = builder.AddSystem(ZeroOrderHold(period_sec=0.001, vector_size=controller.n_servos))
+    filter = builder.AddSystem(FirstOrderLowPassFilter(time_constant=0.02, size=controller.n_servos))
     builder.Connect(plant.get_state_output_port(), controller.get_input_port(1))
-    builder.Connect(controller.get_output_port(0), plant.get_actuation_input_port())
+    builder.Connect(controller.get_output_port(0), zoh.get_input_port(0))
+    builder.Connect(zoh.get_output_port(0), filter.get_input_port(0))
+    builder.Connect(filter.get_output_port(0), plant.get_actuation_input_port())
     return plant, scene_graph, controller
