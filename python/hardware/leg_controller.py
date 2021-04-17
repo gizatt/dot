@@ -46,8 +46,12 @@ class LegHardwareInterface():
         self.hip_abduct_info = hip_abduct_info
         self.hip_pitch_info = hip_pitch_info
         self.knee_pitch_info = knee_pitch_info
+        # Infos in their canonical order that matches q.
+        self.infos = [hip_abduct_info, hip_pitch_info, knee_pitch_info]
         self.fourbar_eps = 30. * np.pi/180. # 45 deg safety for fourbar
         self.curr_pose = None
+        self.q_lb = np.array([info.servo_min_rad for info in self.infos])
+        self.q_ub = np.array([info.servo_max_rad for info in self.infos])
         self.set_leg_posture(q0)
 
     def convert_pose_command_to_feasible_pose(self, q):
@@ -57,11 +61,10 @@ class LegHardwareInterface():
         bounded_q = deepcopy(q)
         knee_lb = q[1] - np.pi/2. + self.fourbar_eps
         knee_ub = q[1] + np.pi/2. - self.fourbar_eps
-        bounded_q[2] = np.clip(bounded_q[2], knee_lb, knee_ub)
+        new_knee = np.clip(bounded_q[2], knee_lb, knee_ub)
+        bounded_q[2] = new_knee
         
-        for k, info in enumerate([self.hip_abduct_info, self.hip_pitch_info, self.knee_pitch_info]):
-            bounded_q[k] = np.clip(bounded_q[k], info.servo_min_rad, info.servo_max_rad)
-        
+        bounded_q = np.clip(bounded_q, self.q_lb, self.q_ub)
         if not np.allclose(bounded_q, q):
             logging.warning("Bounding q from %s to %s.", q, bounded_q)
 
@@ -74,7 +77,7 @@ class LegHardwareInterface():
         # and 90 - eps of the hip angle to not break the four bar.
 
         bounded_q = self.convert_pose_command_to_feasible_pose(q)
-        for k, info in enumerate([self.hip_abduct_info, self.hip_pitch_info, self.knee_pitch_info]):
+        for k, info in enumerate(self.infos):
             pos_in_us = info.convert_rad_to_us(bounded_q[k])
 
             # Commit command
@@ -85,6 +88,8 @@ class LegHardwareInterface():
         # qd in deg/sec
         qtarg = self.convert_pose_command_to_feasible_pose(qtarg)
         max_step_allowed = qd * dt
+        start_time = time.time()
+        timeout = 2 * np.max(np.abs(self.curr_pose - qtarg)) / qd
         while (1):
             qerr = qtarg - self.curr_pose
             if np.sum(np.abs(qerr)) < 1e-6:
@@ -94,6 +99,9 @@ class LegHardwareInterface():
             last_applied_time = time.time()
             while time.time() - last_applied_time < dt:
                 time.sleep(time.time() - last_applied_time)
+            if time.time() - start_time > timeout:
+                logging.warning("Slew to posture timed out. Why?")
+                return
         
 
 if __name__ == "__main__":
@@ -132,12 +140,9 @@ if __name__ == "__main__":
         knee_pitch_info
     )
 
-    infos = [hip_abduct_info, hip_pitch_info, knee_pitch_info]
-    lbs = np.array([info.servo_min_rad for info in infos])
-    ubs = np.array([info.servo_max_rad for info in infos])
     rng = np.random.default_rng()
     for k in range(10):
-        qtarg = rng.uniform(low=lbs, high=ubs)
+        qtarg = rng.uniform(low=leg_hardware_interface.q_lb, high=leg_hardware_interface.q_ub)
         leg_hardware_interface.slew_to_posture(qtarg)
         time.sleep(1.)
     leg_hardware_interface.slew_to_posture(np.array([0, 0, 0]))
