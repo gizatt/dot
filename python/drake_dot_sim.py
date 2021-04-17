@@ -94,11 +94,6 @@ class ServoController(LeafSystem):
         # Servo simulator PD gains.
         self.Kp_for_vel_target = 100.
         self.Kp_for_torque = 100.
-        # In this deadzone, direction position PD is applied, which is more
-        # stable for contacts / holding position.
-        self.angle_deadzone = 10.0 * np.pi/180.
-        self.deadzone_Kp = 10.
-        self.deadzone_Kd = 1.
         
         
 
@@ -168,12 +163,6 @@ class ServoController(LeafSystem):
         velocity_target = self.Kp_for_vel_target * (servo_angle_setpoints - servo_angles_curr)
         velocity_target = np.clip(velocity_target, -self.speed_limits, self.speed_limits)
         servo_torques = self.Kp_for_torque * (velocity_target - servo_velocities_curr)
-        
-        # Deadzone control
-        servo_torques_deadzone = self.deadzone_Kp * (servo_angle_setpoints - servo_angles_curr) + \
-                        self.deadzone_Kd * (-servo_velocities_curr)
-        deadzone_mask = np.abs(servo_angle_setpoints - servo_angles_curr) <= self.angle_deadzone
-        servo_torques[deadzone_mask] = servo_torques_deadzone[deadzone_mask]
 
         # Limit and map torques back to actuation inputs.
         servo_torques = np.clip(servo_torques, -self.torque_limits, self.torque_limits)
@@ -302,17 +291,22 @@ def setup_dot_diagram(builder, args):
     The returned controller will need its first port connected to
     a setpoint source.'''
 
+    print("TODO: load in servo calibration dict to a servo calibration object that gets shared")
+
     with open(args.yaml_path, "r") as f:
         config_dict = yaml.load(f, Loader=Loader)
     sdf_path = os.path.join(os.path.dirname(args.yaml_path), config_dict["sdf_path"])
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, 0.0005)
     parser = Parser(plant)
     model = parser.AddModelFromFile(sdf_path)
+
+    # Set initial pose floating above the ground.
     plant.SetDefaultFreeBodyPose(plant.GetBodyByName("body"), RigidTransform(p=[0., 0., 0.25]))
     if args.welded:
         plant.WeldFrames(plant.world_frame(), plant.GetBodyByName("body").body_frame())
     else:
         add_ground(plant)
+
     plant.Finalize()
 
     controller = builder.AddSystem(ServoController(plant, config_dict))

@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<sdf version="1.7">
+<?xml version="1.0" encoding="utf-8"?>
+<sdf version="1.7" xmlns:drake="http://drake.mit.edu">
     <!-- Robot dimensions, all units meters.
         FORWARD IS +X
         LEFT IS +Y
@@ -28,6 +28,22 @@
             <ambient>${color}</ambient>
             <diffuse>${color}</diffuse>
         </material>
+    </xacro_define_macro>
+
+    <xacro_define_macro name="servo_reflected_inertia" params="" xmlns:drake="http://drake.mit.edu">
+        <drake:rotor_inertia>1e-7</drake:rotor_inertia>
+        <drake:gear_ratio>300.0</drake:gear_ratio>
+    </xacro_define_macro>
+
+    <xacro_define_macro name="servo_dynamics" params="">
+        <dynamics>
+          <damping>1.5e-2</damping>
+        </dynamics>
+    </xacro_define_macro>
+
+    <xacro_define_macro name="servo_dynamic_limits" params="">
+        <effort>${0.098 * 20.0}</effort>
+        <!-- velocity limits not enforced by drake -->
     </xacro_define_macro>
 
     <xacro_define_macro name="vis_and_col_ball" params="prefix r color pose">
@@ -118,13 +134,11 @@
                 <limit>
                     <lower>${-pi/2}</lower>
                     <upper>${pi/2}</upper>
-                    <effort>10.0</effort>
-                    <velocity>10</velocity>
+                    <xacro_macro name="servo_dynamic_limits"/>
                 </limit>
-                <dynamics>
-                  <damping>1.5e-2</damping>
-                </dynamics>
+                <xacro_macro name="servo_dynamics"/>
             </axis>
+            <xacro_macro name="servo_reflected_inertia"/>
         </joint>
         
         <!-- hip-->
@@ -155,15 +169,13 @@
             <axis>
                 <xyz>0. 1. 0.</xyz>
                 <limit>
-                    <lower>${-pi/2}</lower>
-                    <upper>${pi/2}</upper>
-                    <effort>10.0</effort>
-                    <velocity>10</velocity>
+                    <lower>${-pi}</lower>
+                    <upper>${0}</upper>
+                    <xacro_macro name="servo_dynamic_limits"/>
                 </limit>
-                <dynamics>
-                  <damping>1.5e-2</damping>
-                </dynamics>
+                <xacro_macro name="servo_dynamics"/>
             </axis>
+            <xacro_macro name="servo_reflected_inertia"/>
         </joint>
 
         <!-- shin-->
@@ -197,14 +209,11 @@
                 <limit>
                     <lower>${-pi}</lower>
                     <upper>${0}</upper>
-                    <effort>10.0</effort>
-                    <velocity>10</velocity>
+                    <xacro_macro name="servo_dynamic_limits"/>
                 </limit>
-                <dynamics>
-                  <damping>1.5e-2</damping>
-                </dynamics>
-                <initial_position>${-pi/2}</initial_position>
+                <xacro_macro name="servo_dynamics"/>
             </axis>
+            <xacro_macro name="servo_reflected_inertia"/>
         </joint>
 
     </xacro_define_macro>
