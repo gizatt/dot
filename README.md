@@ -3,13 +3,17 @@
 
 # Deps
 
+## Basic dependencies.
+
 python3.6
 
 http://wiki.ros.org/noetic/Installation/Ubuntu
 `sudo apt install ros-noetic-rosserial-arduino bossa-cli`
+`pip3 install panel`
 
 ## Udev
 
+TODO
 
 
 ## Arm cross-compiler
@@ -38,17 +42,11 @@ arm-none-eabi-gdb --version
 arm-none-eabi-size --version
 ```
 
+Install bossac and get it on path:
 ```
 wget https://github.com/shumatech/BOSSA/archive/refs/tags/1.6.1-arduino.zip && unzip 1.6.1-arduino.zip
 cd BOSSA-1.6.1-arduino && ./arduino/make_package.sh
 sudo cp bin/bossac /usr/local/bin/bossac
-
-Building sam core manually
-```
-export ARM_GCC_TOOLCHAIN=/usr/share/$VERSION_STRING/bin
-git clone https://github.com/arduino/ArduinoCore-sam
-cd ArduinoCore-sam/system/libsam/build_gcc/ && make && 
-cd Arduino-core-sam/variants/arduino_due_x && make
 ```
 
 
@@ -76,9 +74,7 @@ arduino-cli core install arduino:sam@1.6.12 -v
 ```
 
 Edit `~/.arduino15/packages/arduino/hardware/sam/1.6.12/platform.txt` and change `compiler.path`
-to something like `compiler.path=/usr/share/gcc-arm-none-eabi-9-2020-q2-update/bin/`, and remove
-the `-U [stuff]` pattern from `tools.bossac.upload.pattern`. (Not sure why, but the new version of `bossac`
-doesn't like it.)
+to something like `compiler.path=/usr/share/gcc-arm-none-eabi-9-2020-q2-update/bin/`.
 
 Check that it works:
 ```
@@ -86,6 +82,13 @@ arduino-cli sketch new /tmp/TestSketch
 arduino-cli compile --fqbn arduino:sam:arduino_due_x_dbg -e /tmp/TestSketch
 arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:sam:arduino_due_x_dbg /tmp/TestSketch
 ```
+
+TODO: make a custom Due device library for arduino-cli so this stuff happens automatically.
+
+## Arduino libraries
+
+`arduino-cli lib install "Rosserial Arduino Library"`
+`arduino-cli lib install "Adafruit PWM Servo Driver Library"`
 
 # Ref
 http://wiki.ros.org/rosserial_arduino/Tutorials/Arduino%20IDE%20Setup

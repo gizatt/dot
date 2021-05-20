@@ -1,0 +1,20 @@
+left_front_leg:
+    hip_abduct_info:
+        servo_ind: 0
+        servo_0deg_us: 1480
+        servo_90deg_us: 2250
+        servo_min_us: 1390
+        servo_max_us: 2250
+    hip_pitch_info:
+        servo_ind: 1
+        servo_0deg_us: 1334
+        servo_90deg_us: 1940
+        servo_min_us: 1050
+        servo_max_us: 2100
+    knee_pitch_info:
+        servo_ind: 2
+        servo_0deg_us: 1321
+        servo_90deg_us: 734
+        servo_min_us: 600
+        servo_max_us: 1950
+    

@@ -1,5 +1,4 @@
 from copy import deepcopy
-import maestro
 import time
 import numpy as np
 import scipy as sp
@@ -7,52 +6,52 @@ import scipy.interpolate
 import sys
 from collections import namedtuple
 import logging
+import yaml
 
-class LegHardwareInterface():
-    '''
-        Commands a given leg using the supplied maestro controller.
-        Takes some simple joint limits into account to keep the
-        leg from being driven into bad configurations.
-        (Does not prevent all bad configs, so be careful!
-    '''
+import rospy
+from ros_utils import convert_np_vector_to_int16_multi_array
+from std_msgs.msg import Int16MultiArray
+
+class ServoInfo:
     # ServoInfo is descriptive enough to tell how to put a given
     # servo at a particular angle, where 0* is hip abduct straight out,
     # hip straight down, knee straight forward.
-
-    class ServoInfo:
-        def __init__(self, maestro, ind, servo_0deg_us, servo_90deg_us, servo_min_us, servo_max_us):
-            self.maestro = maestro
-            self.ind = ind
-            self.servo_0deg_us = servo_0deg_us
-            self.servo_90deg_us = servo_90deg_us
-            self.servo_min_us = servo_min_us
-            self.servo_max_us = servo_max_us
-            self.servo_us_per_rad = (servo_90deg_us - servo_0deg_us) / (np.pi/2.)
-            # Handle whether angles and us coordinates are flipped or not.
-            servo_bound_1 = self.convert_us_to_rad(servo_min_us)
-            servo_bound_2 = self.convert_us_to_rad(servo_max_us)
-            self.servo_min_rad = min(servo_bound_1, servo_bound_2)
-            self.servo_max_rad = max(servo_bound_1, servo_bound_2)
-
-            print("Servo %d bounds " % ind, self.servo_min_rad, self.servo_max_rad)
-        def convert_rad_to_us(self, rad):
-            return rad * self.servo_us_per_rad + self.servo_0deg_us
-        def convert_us_to_rad(self, us):
-            return (us - self.servo_0deg_us) / self.servo_us_per_rad
-
-
-
-    def __init__(self, q0, hip_abduct_info, hip_pitch_info, knee_pitch_info):
-        self.hip_abduct_info = hip_abduct_info
-        self.hip_pitch_info = hip_pitch_info
-        self.knee_pitch_info = knee_pitch_info
+    def __init__(self, servo_config):
+        # Servo config is a subset of the YAML config for the
+        # leg.
+        self.ind = servo_config["servo_ind"]
+        self.servo_0deg_us = servo_config["servo_0deg_us"]
+        self.servo_90deg_us = servo_config["servo_90deg_us"]
+        self.servo_min_us = servo_config["servo_min_us"]
+        self.servo_max_us = servo_config["servo_max_us"]
+        self.servo_us_per_rad = (self.servo_90deg_us - self.servo_0deg_us) / (np.pi/2.)
+        # Handle whether angles and us coordinates are flipped or not.
+        servo_bound_1 = self.convert_us_to_rad(self.servo_min_us)
+        servo_bound_2 = self.convert_us_to_rad(self.servo_max_us)
+        self.servo_min_rad = min(servo_bound_1, servo_bound_2)
+        self.servo_max_rad = max(servo_bound_1, servo_bound_2)
+    def convert_rad_to_us(self, rad):
+        return rad * self.servo_us_per_rad + self.servo_0deg_us
+    def convert_us_to_rad(self, us):
+        return (us - self.servo_0deg_us) / self.servo_us_per_rad
+        
+class LegHardwareInterface():
+    '''
+        Generates servo microsecond commands for a given leg.
+        Takes some simple joint limits into account to keep the
+        leg from being driven into bad configurations.
+        (Does not prevent all bad configs, so be careful!)
+    '''
+    def __init__(self, q0, leg_config):
+        # Leg config is a subset of the YAML config for the robot.
+        self.hip_abduct_info = ServoInfo(leg_config["hip_abduct_info"])
+        self.hip_pitch_info = ServoInfo(leg_config["hip_pitch_info"])
+        self.knee_pitch_info = ServoInfo(leg_config["knee_pitch_info"])
         # Infos in their canonical order that matches q.
-        self.infos = [hip_abduct_info, hip_pitch_info, knee_pitch_info]
+        self.infos = [self.hip_abduct_info, self.hip_pitch_info, self.knee_pitch_info]
         self.fourbar_eps = 30. * np.pi/180. # 45 deg safety for fourbar
-        self.curr_pose = None
         self.q_lb = np.array([info.servo_min_rad for info in self.infos])
         self.q_ub = np.array([info.servo_max_rad for info in self.infos])
-        self.set_leg_posture(q0)
 
     def convert_pose_command_to_feasible_pose(self, q):
         # Given a pose target in radians, converts to a feasible
@@ -70,80 +69,76 @@ class LegHardwareInterface():
 
         return bounded_q
 
-    def set_leg_posture(self, q):
+    def convert_pose_to_us(self, q):
         # Ordering hip_abduct, hip_pitch, knee_pitch
         # Enforce their individual bound limits, but also
         # constraint that the knee angle must be within -90 + eps,
         # and 90 - eps of the hip angle to not break the four bar.
 
         bounded_q = self.convert_pose_command_to_feasible_pose(q)
-        for k, info in enumerate(self.infos):
-            pos_in_us = info.convert_rad_to_us(bounded_q[k])
+        us = np.array([info.convert_rad_to_us(bounded_q[k]) for k, info in enumerate(self.infos)])
+        return us
 
-            # Commit command
-            info.maestro.setTarget(info.ind,int(pos_in_us*4))
-        self.curr_pose = bounded_q
-
-    def slew_to_posture(self, qtarg, qd=np.pi/2., dt=0.01):
-        # qd in deg/sec
-        qtarg = self.convert_pose_command_to_feasible_pose(qtarg)
-        max_step_allowed = qd * dt
-        start_time = time.time()
-        timeout = 2 * np.max(np.abs(self.curr_pose - qtarg)) / qd
-        while (1):
-            qerr = qtarg - self.curr_pose
-            if np.sum(np.abs(qerr)) < 1e-6:
-                return
-            step_applied = np.clip(qerr, -max_step_allowed, max_step_allowed)
-            self.set_leg_posture(self.curr_pose + step_applied)
-            last_applied_time = time.time()
-            while time.time() - last_applied_time < dt:
-                time.sleep(time.time() - last_applied_time)
-            if time.time() - start_time > timeout:
-                logging.warning("Slew to posture timed out. Why?")
-                return
+class HardwareInterface():
+    '''
+        Generates servo microsecond commands for the entire leg.
+        Takes simple joint limits into account (on a per-leg level),
+        but doesn't prevent all bad configs, so be wary.
+    '''
+    def __init__(self, q0, config):
+        # q0 is a 16-length np vector.
+        assert(q0.shape == (16,))
+        # Config is a YAML config containing the individual leg configs.
+        self.left_front_leg = LegHardwareInterface(
+            q0[0:3],
+            config["left_front_leg"]
+        )
         
+        self.pub = rospy.Publisher('motor_command', Int16MultiArray, queue_size=1)
+
+    def convert_pose_to_us(self, q):
+        assert q.shape == (16,)
+        us = np.zeros(16) - 1
+        us[0:3] = self.left_front_leg.convert_pose_to_us(q[:3])
+        return us
+    
+    def send_pose(self, q):
+        assert q.shape == (16,)
+        self.pub.publish(
+            convert_np_vector_to_int16_multi_array(
+                self.convert_pose_to_us(q)
+        ))
+    def send_us(self, us):
+        ''' WARNING: NO SANITY CHECKING! '''
+        assert us.shape == (16,)
+        self.pub.publish(
+            convert_np_vector_to_int16_multi_array(us)
+        )
+
+def main():
+    with open("servo_config.yaml") as f:
+        servo_configs = yaml.load(f)
+
+    rospy.init_node('leg_controller', anonymous=False)
+
+    q = np.zeros(16)
+    leg_interface = HardwareInterface(q, servo_configs)
+
+    t0 = time.time()
+    rate = rospy.Rate(30) # hz
+    while not rospy.is_shutdown():
+        q[2] = np.sin(time.time() - t0) * 0
+        leg_interface.send_pose(q)
+        rate.sleep()
 
 if __name__ == "__main__":
-    servo = maestro.Controller(ttyStr='/dev/ttyACM0')
+    try:
+        main()
+    except rospy.ROSInterruptException:
+        pass
 
-    hip_abduct_info = LegHardwareInterface.ServoInfo(
-        maestro=servo,
-        ind=0,
-        servo_0deg_us=1480,
-        servo_90deg_us=840,
-        servo_min_us=1200, # 800 is straight up, but too big for my test mount
-        servo_max_us=1450 # more reaches under the robot but hits test stand
-    )
-    hip_pitch_info = LegHardwareInterface.ServoInfo(
-        maestro=servo,
-        ind=1,
-        servo_0deg_us=1480,
-        servo_90deg_us=2150,
-        servo_min_us=1200,
-        servo_max_us=2350
-    )
-    knee_pitch_info = LegHardwareInterface.ServoInfo(
-        maestro=servo,
-        ind=2,
-        servo_0deg_us=1480,
-        servo_90deg_us=815,
-        servo_min_us=550,
-        servo_max_us=2100
-    )
-    
-    
-    leg_hardware_interface = LegHardwareInterface(
-        np.zeros(3),
-        hip_abduct_info,
-        hip_pitch_info,
-        knee_pitch_info
-    )
 
-    rng = np.random.default_rng()
-    for k in range(10):
-        qtarg = rng.uniform(low=leg_hardware_interface.q_lb, high=leg_hardware_interface.q_ub)
-        leg_hardware_interface.slew_to_posture(qtarg)
-        time.sleep(1.)
-    leg_hardware_interface.slew_to_posture(np.array([0, 0, 0]))
-    servo.close()
+
+
+
+
