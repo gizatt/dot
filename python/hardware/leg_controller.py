@@ -50,7 +50,7 @@ class LegHardwareInterface():
         self.knee_pitch_info = ServoInfo(leg_config["knee_pitch_info"])
         # Infos in their canonical order that matches q.
         self.infos = [self.hip_abduct_info, self.hip_pitch_info, self.knee_pitch_info]
-        self.fourbar_eps = 30. * np.pi/180. # 45 deg safety for fourbar
+        self.fourbar_eps = 45. * np.pi/180. # 45 deg safety for fourbar
         self.q_lb = np.array([info.servo_min_rad for info in self.infos])
         self.q_ub = np.array([info.servo_max_rad for info in self.infos])
 
@@ -80,6 +80,11 @@ class LegHardwareInterface():
         us = np.array([info.convert_rad_to_us(bounded_q[k]) for k, info in enumerate(self.infos)])
         return us
 
+    def convert_us_to_pose(self, us):
+        # Ordering hip_abduct, hip_pitch, knee_pitch
+        q = np.array([info.convert_us_to_rad(us[k]) for k, info in enumerate(self.infos)])
+        return q
+
 class HardwareInterface():
     '''
         Generates servo microsecond commands for the entire leg.
@@ -90,12 +95,12 @@ class HardwareInterface():
         # q0 is a 12-length np vector.
         assert(q0.shape == (12,))
         # Config is a YAML config containing the individual leg configs.
-        leg_names = config.keys()
+        self.leg_names = config.keys()
         self.us_index_per_q = np.zeros(12).astype(np.int)
         self.q_inds_per_leg = []
         self.us_inds_per_leg = []
         self.legs = []
-        for leg_name in leg_names:
+        for leg_name in self.leg_names:
             leg = LegHardwareInterface(config[leg_name])
             self.legs.append(leg)
             # Built mapping from q to us.
@@ -109,6 +114,9 @@ class HardwareInterface():
 
         self.pub = rospy.Publisher('motor_command', Int16MultiArray, queue_size=1)
 
+        self.curr_pose = q0
+        self.curr_us = self.convert_pose_to_us(q0)
+
     def convert_pose_to_us(self, q):
         assert q.shape == (12,)
         us = np.zeros(16) - 1
@@ -116,15 +124,27 @@ class HardwareInterface():
             us[us_inds] = leg.convert_pose_to_us(q[q_inds])
         return us
     
+    def convert_us_to_pose(self, us):
+        assert us.shape == (16,)
+        q = np.zeros(12)
+        for leg, q_inds, us_inds in zip(self.legs, self.q_inds_per_leg, self.us_inds_per_leg):
+            q[q_inds] = leg.convert_us_to_pose(us[us_inds])
+        return q
+
     def send_pose(self, q):
         assert q.shape == (12,)
+        self.curr_pose = q
+        self.curr_us = self.convert_pose_to_us(q)
         self.pub.publish(
             convert_np_vector_to_int16_multi_array(
-                self.convert_pose_to_us(q)
+                self.curr_us
         ))
+
     def send_us(self, us):
         ''' WARNING: NO SANITY CHECKING! '''
         assert us.shape == (16,)
+        self.curr_us = us
+        self.curr_pose = self.convert_us_to_pose(us)
         self.pub.publish(
             convert_np_vector_to_int16_multi_array(us)
         )
