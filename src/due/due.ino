@@ -22,8 +22,8 @@ void motorCommandCallback( const std_msgs::Int16MultiArray& command_msg){
   }
 }
 ros::Subscriber<std_msgs::Int16MultiArray> command_sub("motor_command", &motorCommandCallback );
-const int MICROSECOND_MIN = 600;
-const int MICROSECOND_MAX = 2400;
+const int MICROSECOND_MIN = 200;
+const int MICROSECOND_MAX = 3000;
 const int SERVO_UPDATE_PERIOD = 10; // Every 10 ms, send servo updates, if there are any.
 long long last_servo_update_time;
 short int sent_command_buffer[16];

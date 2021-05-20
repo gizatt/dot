@@ -43,7 +43,7 @@ class LegHardwareInterface():
         leg from being driven into bad configurations.
         (Does not prevent all bad configs, so be careful!)
     '''
-    def __init__(self, q0, leg_config):
+    def __init__(self, leg_config):
         # Leg config is a subset of the YAML config for the robot.
         self.hip_abduct_info = ServoInfo(leg_config["hip_abduct_info"])
         self.hip_pitch_info = ServoInfo(leg_config["hip_pitch_info"])
@@ -87,25 +87,37 @@ class HardwareInterface():
         but doesn't prevent all bad configs, so be wary.
     '''
     def __init__(self, q0, config):
-        # q0 is a 16-length np vector.
-        assert(q0.shape == (16,))
+        # q0 is a 12-length np vector.
+        assert(q0.shape == (12,))
         # Config is a YAML config containing the individual leg configs.
-        self.left_front_leg = LegHardwareInterface(
-            q0[0:3],
-            config["left_front_leg"]
-        )
+        leg_names = config.keys()
+        self.us_index_per_q = np.zeros(12).astype(np.int)
+        self.q_inds_per_leg = []
+        self.us_inds_per_leg = []
+        self.legs = []
+        for leg_name in leg_names:
+            leg = LegHardwareInterface(config[leg_name])
+            self.legs.append(leg)
+            # Built mapping from q to us.
+            q_inds_for_leg = []
+            us_inds_for_leg = []
+            for info in leg.infos:
+                q_inds_for_leg.append(info.pose_ind)
+                us_inds_for_leg.append(info.servo_ind)
+            self.q_inds_per_leg.append(q_inds_for_leg)
+            self.us_inds_per_leg.append(us_inds_for_leg)
 
         self.pub = rospy.Publisher('motor_command', Int16MultiArray, queue_size=1)
 
     def convert_pose_to_us(self, q):
-        raise NotImplementedError("Pose to servo ind mapping")
-        assert q.shape == (16,)
+        assert q.shape == (12,)
         us = np.zeros(16) - 1
-        us[0:3] = self.left_front_leg.convert_pose_to_us(q[:3])
+        for leg, q_inds, us_inds in zip(self.legs, self.q_inds_per_leg, self.us_inds_per_leg):
+            us[us_inds] = leg.convert_pose_to_us(q[q_inds])
         return us
     
     def send_pose(self, q):
-        assert q.shape == (16,)
+        assert q.shape == (12,)
         self.pub.publish(
             convert_np_vector_to_int16_multi_array(
                 self.convert_pose_to_us(q)
@@ -123,13 +135,12 @@ def main():
 
     rospy.init_node('leg_controller', anonymous=False)
 
-    q = np.zeros(16)
+    q = np.zeros(12)
     leg_interface = HardwareInterface(q, servo_configs)
 
     t0 = time.time()
     rate = rospy.Rate(30) # hz
     while not rospy.is_shutdown():
-        q[2] = np.sin(time.time() - t0) * 0
         leg_interface.send_pose(q)
         rate.sleep()
 
