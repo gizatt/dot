@@ -19,7 +19,8 @@ class ServoInfo:
     def __init__(self, servo_config):
         # Servo config is a subset of the YAML config for the
         # leg.
-        self.ind = servo_config["servo_ind"]
+        self.servo_ind = servo_config["servo_ind"]
+        self.pose_ind = servo_config["pose_ind"]
         self.servo_0deg_us = servo_config["servo_0deg_us"]
         self.servo_90deg_us = servo_config["servo_90deg_us"]
         self.servo_min_us = servo_config["servo_min_us"]
@@ -93,10 +94,11 @@ class HardwareInterface():
             q0[0:3],
             config["left_front_leg"]
         )
-        
+
         self.pub = rospy.Publisher('motor_command', Int16MultiArray, queue_size=1)
 
     def convert_pose_to_us(self, q):
+        raise NotImplementedError("Pose to servo ind mapping")
         assert q.shape == (16,)
         us = np.zeros(16) - 1
         us[0:3] = self.left_front_leg.convert_pose_to_us(q[:3])

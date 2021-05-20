@@ -1,20 +1,91 @@
 left_front_leg:
     hip_abduct_info:
         servo_ind: 0
+        pose_ind: 0
         servo_0deg_us: 1480
-        servo_90deg_us: 2250
+        servo_90deg_us: 2250   # HIP POINTING UP
         servo_min_us: 1390
-        servo_max_us: 2250
+        servo_max_us: 2250    # very conservative
     hip_pitch_info:
         servo_ind: 1
+        pose_ind: 1
         servo_0deg_us: 1334
-        servo_90deg_us: 1940
+        servo_90deg_us: 1940  # straight back
         servo_min_us: 1050
         servo_max_us: 2100
     knee_pitch_info:
         servo_ind: 2
+        pose_ind: 2
         servo_0deg_us: 1321
         servo_90deg_us: 734
         servo_min_us: 600
         servo_max_us: 1950
-    
+  
+right_front_leg:
+    hip_abduct_info:
+        servo_ind: 4
+        pose_ind: 3
+        servo_0deg_us: 1500
+        servo_90deg_us: 650   # HIP POINTING UP
+        servo_min_us: 600
+        servo_max_us: 1650  # very conservative
+    hip_pitch_info:
+        servo_ind: 5
+        pose_ind: 4
+        servo_0deg_us: 1404 
+        servo_90deg_us: 540
+        servo_min_us: 500
+        servo_max_us: 1800
+    knee_pitch_info:
+        servo_ind: 6
+        pose_ind: 5
+        servo_0deg_us: 1353
+        servo_90deg_us: 2195 # probably need to shift the horn to get more ROM?
+        servo_min_us: 523
+        servo_max_us: 2195
+
+left_rear_leg:
+    hip_abduct_info:
+        servo_ind: 8
+        pose_ind: 6
+        servo_0deg_us: 1274
+        servo_90deg_us: 2063   # HIP POINTING UP
+        servo_min_us: 1100    # very conservative
+        servo_max_us: 2129
+    hip_pitch_info:
+        servo_ind: 9
+        pose_ind: 7
+        servo_0deg_us: 1302
+        servo_90deg_us: 1894   # straight back
+        servo_min_us: 1020
+        servo_max_us: 2150
+    knee_pitch_info:
+        servo_ind: 10
+        pose_ind: 8
+        servo_0deg_us: 1321
+        servo_90deg_us: 691
+        servo_min_us: 531
+        servo_max_us: 1855
+
+right_rear_leg:
+    hip_abduct_info:
+        servo_ind: 12
+        pose_ind: 9
+        servo_0deg_us: 1406
+        servo_90deg_us: 617   # HIP POINTING UP
+        servo_min_us: 650
+        servo_max_us: 1510  # very conservative
+    hip_pitch_info:
+        servo_ind: 13
+        pose_ind: 10
+        servo_0deg_us: 1293 
+        servo_90deg_us: 692
+        servo_min_us: 520
+        servo_max_us: 1600
+    knee_pitch_info:
+        servo_ind: 14
+        pose_ind: 11
+        servo_0deg_us: 1387
+        servo_90deg_us: 2007
+        servo_min_us: 730
+        servo_max_us: 2130
