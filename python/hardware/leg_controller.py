@@ -12,6 +12,7 @@ import rospy
 from ros_utils import convert_np_vector_to_int16_multi_array
 from std_msgs.msg import Int16MultiArray
 
+
 class ServoInfo:
     # ServoInfo is descriptive enough to tell how to put a given
     # servo at a particular angle, where 0* is hip abduct straight out,

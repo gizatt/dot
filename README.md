@@ -4,7 +4,7 @@
 
 Necessary parts:
 1) `roscore`
-2) `rosrun rosserial_arduino serial_node.py _port:=/dev/ttyACM0`
+2) `rosrun rosserial_arduino serial_node.py _port:=/dev/ttyACM0 _baud:=115200` (may need to `sudo chmod 666 /dev/ttyACM0`)
 3) e.g. interface `panel serve teleop_panel.py --allow-websocket-origin=192.168.0.142:5006`
 
 Flash with `make due_update port=/dev/ttyACM0`.
