@@ -4,6 +4,21 @@ import rospy
 import yaml
 import time
 
+'''
+When run, does a handful of steps of forward walking.
+
+For prototyping states in a very walking state machine.
+
+Ordering of motions for a statically stable walk:
+
+Given a walking vector:
+
+1) Pick a foot to move.
+2) Shift the COM away from that foot.
+3) Move the foot in the walking vector direction.
+4) Next foot to move is the next in a predetermined foot order.
+   (Probably LF -> RH -> RF -> LH.)
+'''
 
 def do_ik(ee_target):
     angles = single_leg_forward_kin(
@@ -15,21 +30,16 @@ def do_ik(ee_target):
     )
     return angles
 
+
 def main():
     with open("servo_config.yaml") as f:
         servo_configs = yaml.load(f)
-
-    # Make only left front leg active
-    #servo_configs = {"left_front_leg": servo_configs["left_front_leg"]}
-    #                 #"right_front_leg": servo_configs["right_front_leg"]}
 
     rospy.init_node('test_ik_node', anonymous=False)
 
     q = np.zeros(12)
     leg_interface = HardwareInterface(q, servo_configs)
 
-
-    
     t0 = time.time()
     rate = rospy.Rate(30) # hz
     while not rospy.is_shutdown():

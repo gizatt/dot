@@ -58,11 +58,12 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
   long long t = millis();
+  /*
   if (t < last_led_flip_time || t > last_led_flip_time + 500){
     digitalWrite(13, led_state);   // turn the LED on (HIGH is the voltage level)
     led_state = !led_state;
     last_led_flip_time = t;
-  }
+  }*/
 
   // Update servo commands
   if (t < last_servo_update_time || t > last_servo_update_time + SERVO_UPDATE_PERIOD){
@@ -83,6 +84,8 @@ void loop() {
       }
     }
     last_servo_update_time = t;
+    digitalWrite(13, led_state);   // turn the LED on (HIGH is the voltage level)
+    led_state = !led_state;
   }
 
 

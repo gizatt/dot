@@ -79,7 +79,7 @@ class LegHardwareInterface():
 
         bounded_q = self.convert_pose_command_to_feasible_pose(q)
         us = np.array([info.convert_rad_to_us(bounded_q[k]) for k, info in enumerate(self.infos)])
-        return us
+        return us, not np.allclose(bounded_q, q)
 
     def convert_us_to_pose(self, us):
         # Ordering hip_abduct, hip_pitch, knee_pitch
@@ -116,14 +116,18 @@ class HardwareInterface():
         self.pub = rospy.Publisher('motor_command', Int16MultiArray, queue_size=1)
 
         self.curr_pose = q0
-        self.curr_us = self.convert_pose_to_us(q0)
+        self.curr_us, _ = self.convert_pose_to_us(q0)
 
     def convert_pose_to_us(self, q):
         assert q.shape == (12,)
         us = np.zeros(16) - 1
-        for leg, q_inds, us_inds in zip(self.legs, self.q_inds_per_leg, self.us_inds_per_leg):
-            us[us_inds] = leg.convert_pose_to_us(q[q_inds])
-        return us
+        required_projection = False
+        for leg, q_inds, us_inds, leg_name in zip(self.legs, self.q_inds_per_leg, self.us_inds_per_leg, self.leg_names):
+            us[us_inds], required_projection_this = leg.convert_pose_to_us(q[q_inds])
+            if required_projection_this:
+                print("Projected leg ", leg_name)
+                required_projection = required_projection_this
+        return us, required_projection
     
     def convert_us_to_pose(self, us):
         assert us.shape == (16,)
@@ -132,14 +136,19 @@ class HardwareInterface():
             q[q_inds] = leg.convert_us_to_pose(us[us_inds])
         return q
 
-    def send_pose(self, q):
+    def send_pose(self, q, allow_projection=True):
         assert q.shape == (12,)
+        us_candidate, required_projection = self.convert_pose_to_us(q)
+        if allow_projection is False and required_projection is True:
+            print("Not sending pose due to failed projection.")
+            return False
         self.curr_pose = q
-        self.curr_us = self.convert_pose_to_us(q)
+        self.curr_us = us_candidate
         self.pub.publish(
             convert_np_vector_to_int16_multi_array(
                 self.curr_us
         ))
+        return True
 
     def send_us(self, us):
         ''' WARNING: NO SANITY CHECKING! '''

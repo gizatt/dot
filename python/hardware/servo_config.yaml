@@ -4,7 +4,7 @@ left_front_leg:
         pose_ind: 0
         servo_0deg_us: 1480
         servo_90deg_us: 2250   # HIP POINTING UP
-        servo_min_us: 1390
+        servo_min_us: 1150
         servo_max_us: 2250    # very conservative
     hip_pitch_info:
         servo_ind: 1
@@ -28,7 +28,7 @@ right_front_leg:
         servo_0deg_us: 1500
         servo_90deg_us: 650   # HIP POINTING UP
         servo_min_us: 600
-        servo_max_us: 1650  # very conservative
+        servo_max_us: 1850  # very conservative
     hip_pitch_info:
         servo_ind: 5
         pose_ind: 4
@@ -50,7 +50,7 @@ left_rear_leg:
         pose_ind: 6
         servo_0deg_us: 1274
         servo_90deg_us: 2063   # HIP POINTING UP
-        servo_min_us: 1100    # very conservative
+        servo_min_us: 800    # very conservative
         servo_max_us: 2129
     hip_pitch_info:
         servo_ind: 9
@@ -74,7 +74,7 @@ right_rear_leg:
         servo_0deg_us: 1406
         servo_90deg_us: 617   # HIP POINTING UP
         servo_min_us: 650
-        servo_max_us: 1510  # very conservative
+        servo_max_us: 1750  # very conservative
     hip_pitch_info:
         servo_ind: 13
         pose_ind: 10
