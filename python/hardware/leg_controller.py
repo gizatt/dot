@@ -125,7 +125,6 @@ class HardwareInterface():
         for leg, q_inds, us_inds, leg_name in zip(self.legs, self.q_inds_per_leg, self.us_inds_per_leg, self.leg_names):
             us[us_inds], required_projection_this = leg.convert_pose_to_us(q[q_inds])
             if required_projection_this:
-                print("Projected leg ", leg_name)
                 required_projection = required_projection_this
         return us, required_projection
     
@@ -140,7 +139,6 @@ class HardwareInterface():
         assert q.shape == (12,)
         us_candidate, required_projection = self.convert_pose_to_us(q)
         if allow_projection is False and required_projection is True:
-            print("Not sending pose due to failed projection.")
             return False
         self.curr_pose = q
         self.curr_us = us_candidate

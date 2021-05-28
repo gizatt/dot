@@ -1,7 +1,0 @@
-std_msgs/Header header
-string leg_name
-float64 x
-float64 y
----
-std_msgs/Bool success
-string info

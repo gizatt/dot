@@ -1,6 +1,7 @@
 std_msgs/Header header
 string leg_name
 geometry_msgs/Vector3 desired_xyz
+std_msgs/Bool end_in_support
 ---
 std_msgs/Bool success
 string info

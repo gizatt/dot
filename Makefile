@@ -12,6 +12,6 @@ due_reset:
 due_update: rosserial_setup due_build due_reset due_flash
 
 catkin:
-	cd catkin && catkin_make
+	cd catkin && touch src/dot_msgs/CMakeLists.txt && catkin_make
 
 .PHONY: rosserial_setup catkin

@@ -59,7 +59,6 @@ add_service_files(
   FILES
   MoveCom.srv
   MoveFoot.srv
-  PlaceFoot.srv
 )
 
 ## Generate actions in the 'action' folder

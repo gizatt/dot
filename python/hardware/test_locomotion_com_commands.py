@@ -8,13 +8,12 @@ import sys
 import time
 import numpy as np
 import rospy
-from std_msgs.msg import Header
+from std_msgs.msg import Header, Bool
 from geometry_msgs.msg import Vector3
 from sensor_msgs.msg import JointState
 from dot_msgs.srv import (
     MoveCom, MoveComRequest,
-    MoveFoot, MoveFootRequest,
-    PlaceFoot, PlaceFootRequest
+    MoveFoot, MoveFootRequest
 )
 
 def move_com_relative(com_target):

@@ -11,9 +11,9 @@ Flash with `make due_update port=/dev/ttyACM0`.
 
 Fun demos:
 - `python locomotion_server.py`
-- `python test_locomotion_commands.py -com_rel 0.0 0.0 0.25 -step 0.005` smooth moving to com positions
-- `python test_locomotion_commands.py -com_spiral 1. 1.5 0.75 0.00 0.025 0.01 1.57 0. 0. -step 0.05` side to side bouncing
-- `python test_locomotion_commands.py -com_spiral 5. 5. 3. 0.025 0.025 0.01 1.57 0. 0. -step 0.05` circles
+- `python test_locomotion_com_commands.py -com_rel 0.0 0.0 0.25 -step 0.005` smooth moving to com positions
+- `python test_locomotion_com_commands.py -com_spiral 1. 1.5 0.75 0.00 0.025 0.01 1.57 0. 0. -step 0.05` side to side bouncing
+- `python test_locomotion_com_commands.py -com_spiral 5. 5. 3. 0.025 0.025 0.01 1.57 0. 0. -step 0.05` circles
 
 # Deps
 

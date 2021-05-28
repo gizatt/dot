@@ -26,6 +26,7 @@ import yaml
 import rospy
 from ros_utils import convert_np_vector_to_int16_multi_array
 from std_msgs.msg import Int16MultiArray, String
+from sensor_msgs.msg import JointState
 from leg_controller import HardwareInterface
 
 def do_onetime_setup():
@@ -112,6 +113,9 @@ def do_onetime_setup():
                 pose_library_dict = yaml.load(f)
             self.pose_library_buttons = []
             self.pose_library = {}
+            sync_btn = pn.widgets.Button(name="Sync to State", button_type="success")
+            sync_btn.on_click(self.on_sync_click)
+            self.pose_library_buttons.append(sync_btn)
             for key in pose_library_dict.keys():
                 pose = np.array([float(x) for x in pose_library_dict[key]])
                 if pose.shape[0] != 12:
@@ -127,6 +131,8 @@ def do_onetime_setup():
             )
         def on_click(self, event):
             self.parent.display_pose(self.pose_library[event.obj.name])
+        def on_sync_click(self, event):
+            self.parent.display_pose(pn.state.cache["last_joint_state"])
 
     class PoseTeleopPanel(pn.Accordion):
         def __init__(self):
@@ -194,6 +200,8 @@ def do_onetime_setup():
 def chatter_callback(data):
     pn.state.cache["message_box"].value = data.data
     pn.state.cache["microsecond_state_panel"].try_set_state(data.data)
+def robot_state_callback(data):
+    pn.state.cache["last_joint_state"]= np.array(data.position[6:])
 
 def main_loop():
     t0 = time.time()
@@ -225,6 +233,7 @@ def main_loop():
 
 if "onetime_setup" not in pn.state.cache.keys():
     do_onetime_setup()
+    pn.state.cache["last_joint_state"] = np.zeros(12)
     pn.state.cache["onetime_setup"] = True
 
 pn.state.cache["page"].servable()
@@ -232,6 +241,7 @@ pn.state.cache["page"].servable()
 if "thread" not in pn.state.cache.keys():
     rospy.init_node('direct_teleop_controller', anonymous=False)
     rospy.Subscriber("chatter", String, chatter_callback)
+    rospy.Subscriber("/robot_state", JointState, robot_state_callback)
 
     pn.state.cache["thread"] = threading.Thread(target=main_loop)
     pn.state.cache["thread"].start()
