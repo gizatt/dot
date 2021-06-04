@@ -9,17 +9,17 @@ left_front_leg:
     hip_pitch_info:
         servo_ind: 1
         pose_ind: 1
-        servo_0deg_us: 1334
-        servo_90deg_us: 1940  # straight back
-        servo_min_us: 1050
-        servo_max_us: 2100
+        servo_0deg_us: 1387
+        servo_90deg_us: 2170  # straight back
+        servo_min_us: 950
+        servo_max_us: 2270
     knee_pitch_info:
         servo_ind: 2
         pose_ind: 2
-        servo_0deg_us: 1321
-        servo_90deg_us: 734
-        servo_min_us: 600
-        servo_max_us: 1950
+        servo_0deg_us: 1430
+        servo_90deg_us: 560
+        servo_min_us: 550
+        servo_max_us: 2000
   
 right_front_leg:
     hip_abduct_info:

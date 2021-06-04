@@ -27,7 +27,7 @@ class Walker():
     # shifting COM to center of stance feet, picking up foot, moving it forward a few cm,
     # and putting it down.
 
-    def __init__(self, com_height=0.3, com_slew_size=0.005, foot_slew_size=0.005, forward_step_size=0.00, foot_lift_amount=0.05):
+    def __init__(self, com_height=0.16, com_slew_size=0.01, foot_slew_size=0.0125, forward_step_size=0.075, foot_lift_amount=0.05):
         self.curr_robot_state = None
         self.curr_feet_positions = None
         self.curr_stance_status = None
@@ -77,7 +77,7 @@ class Walker():
 
         # Pick foot to advance.
         target_foot = self.foot_ordering[self.curr_foot_k]
-        self.curr_foot_k += 1
+        self.curr_foot_k = (self.curr_foot_k + 1) % 4
 
         # Move COM to center of the stance feet.
         com_target = np.stack([

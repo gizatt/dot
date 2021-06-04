@@ -70,8 +70,8 @@ def do_ik(ee_target, hip_1_in_root_frame, hip_flip=1.):
         ee_target=ee_target,
         hip_1_in_root_frame=hip_1_in_root_frame,
         hip_2_in_hip_1_frame=np.array([0.025, hip_flip*0.043, 0.0]),
-        hip_length=0.16,
-        shin_length=0.16
+        hip_length=0.11,
+        shin_length=0.11
     )
     if angles is False:
         return False
