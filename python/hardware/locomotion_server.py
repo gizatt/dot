@@ -84,7 +84,7 @@ class LocomotionManager():
     status_publish_period = 0.1
     command_publish_period = 1.0
 
-    def __init__(self, z0=0.15):
+    def __init__(self, z0=0.125):
         with open("servo_config.yaml") as f:
             self.servo_configs = yaml.load(f)
 
@@ -114,7 +114,7 @@ class LocomotionManager():
         
         # Setup initial state with feet on ground.
         initial_feet_positions = {
-            f: v[0] + np.array([0., v[1]*0.025, 0.]) for f, v in self.hip_positions.items()
+            f: np.r_[v[0][:2], 0.] + np.array([0., v[1]*0.05, 0.]) for f, v in self.hip_positions.items()
         }
         q0 = self.do_ik_for_feet_and_com(initial_feet_positions, com_q0)
         assert q0 is not False, "Infeasible initial foot positions."
