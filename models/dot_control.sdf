@@ -10,20 +10,21 @@
         UP IS +Z -->
 	<!-- Hip abduction axis forward/back from robot origin -->
 	<!-- Hip abduction axis y displacement -->
+	<!-- Hip abduction axis z displacement -->
 	<!-- Hip abduction axis to hip axis -->
 	<!-- Knee info -->
 	<model name="dot">
 		<link name="body">
 			<inertial>
 				<pose>0 0 0 0 0 0</pose>
-				<mass>2.0</mass>
+				<mass>1.0</mass>
 				<inertia>
-					<ixx>0.0020833333333333337</ixx>
+					<ixx>0.0010416666666666669</ixx>
 					<ixy>0</ixy>
 					<ixz>0</ixz>
-					<iyy>0.015416666666666667</iyy>
+					<iyy>0.0077083333333333335</iyy>
 					<iyz>0</iyz>
-					<izz>0.016666666666666666</izz>
+					<izz>0.008333333333333333</izz>
 				</inertia>
 			</inertial>
 			<visual name="body_visual">
@@ -48,7 +49,7 @@
 		<!-- Pelvis -->
 		<link name="left_front_pelvis">
 			<pose relative_to="body">
-                0.2 0 0 0 0 0
+                0.12 0 0 0 0 0
             </pose>
 			<inertial>
 				<pose>0 0 0 0 0 0</pose>
@@ -64,11 +65,11 @@
 			</inertial>
 			<visual name="left_front_pelvis_rod_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0 0.05 0 1.57075 0 0 </pose>
+				<pose> 0 0.025 0.038 1.57075 0 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.005</radius>
-						<length>0.1</length>
+						<length>0.05</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -77,7 +78,7 @@
 				</material>
 			</visual>
 			<visual name="left_front_pelvis_ball_visual">
-				<pose>0 0.1 0 0 0 0 </pose>
+				<pose>0 0.05 0.038 0 0 0 </pose>
 				<geometry>
 					<sphere>
 						<radius>0.01</radius>
@@ -93,36 +94,36 @@
 			<parent>body</parent>
 			<child>left_front_pelvis</child>
 			<pose relative_to="body">
-                0.2 0 0 0 0 0
+                0.12 0 0 0 0 0
             </pose>
 		</joint>
 		<!-- hip abduction-->
 		<link name="left_front_hip_inner">
 			<pose relative_to="left_front_pelvis">
-                0 0.1 0 0 0 0
+                0 0.05 0.038 0 0 0
             </pose>
 			<inertial>
 				<!-- Guessing the massive servos pull the COM to right between them -->
-				<pose>-0.01 0.01 0 0 0 0</pose>
+				<pose>-0.025 0.043 0 0 0 0</pose>
 				<!-- approx standin inertia -->
-				<mass>0.1</mass>
+				<mass>0.25</mass>
 				<inertia>
-					<ixx>9.895833333333333e-07</ixx>
+					<ixx>1.3411458333333335e-05</ixx>
 					<ixy>0</ixy>
 					<ixz>0</ixz>
-					<iyy>9.895833333333333e-07</iyy>
+					<iyy>1.3411458333333335e-05</iyy>
 					<iyz>0</iyz>
-					<izz>3.125e-07</izz>
+					<izz>7.8125e-07</izz>
 				</inertia>
-				<mass>0.1</mass>
+				<mass>0.25</mass>
 			</inertial>
 			<visual name="left_front_inner_hip_rod_x_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0.01/2 0 0 0 1.57075 0 </pose>
+				<pose> 0.025/2 0 0 0 1.57075 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.0025</radius>
-						<length>0.01</length>
+						<length>0.025</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -132,11 +133,11 @@
 			</visual>
 			<visual name="left_front_inner_hip_rod_y_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0.01 0.005 0 1.57075 0 0 </pose>
+				<pose> 0.025 0.0215 0 1.57075 0 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.0025</radius>
-						<length>0.01</length>
+						<length>0.043</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -145,7 +146,7 @@
 				</material>
 			</visual>
 			<visual name="left_front_inner_hip_ball_visual">
-				<pose>0.01 0.01 0 0 0 0 </pose>
+				<pose>0.025 0.043 0 0 0 0 </pose>
 				<geometry>
 					<sphere>
 						<radius>0.01</radius>
@@ -157,7 +158,7 @@
 				</material>
 			</visual>
 			<visual name="left_front_inner_hip_box_visual">
-				<pose>0.005 0.005 0 0 0 0</pose>
+				<pose>0.0125 0.0215 0 0 0 0</pose>
 				<geometry>
 					<box>
 						<size>0.04 0.04 0.04</size>
@@ -173,10 +174,10 @@
 			<parent>left_front_pelvis</parent>
 			<child>left_front_hip_inner</child>
 			<pose relative_to="left_front_pelvis">
-                0 0.1 0. 0. 0. 0
+                0 0.05 0.038 0. 0. 0
             </pose>
 			<axis>
-				<xyz>1. 0. 0.</xyz>
+				<xyz>1.0 0. 0.</xyz>
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
@@ -184,7 +185,7 @@
 					<!-- velocity limits not enforced by drake -->
 				</limit>
 				<dynamics>
-					<damping>0.01</damping>
+					<damping>1.5e-2</damping>
 				</dynamics>
 			</axis>
 			<drake:rotor_inertia>1e-7</drake:rotor_inertia>
@@ -194,7 +195,7 @@
 		<link name="left_front_hip">
 			<!-- Goes straight down at base posture -->
 			<pose relative_to="left_front_hip_inner">
-                0.01 0.01 0 0 0 0
+                0.025 0.043 0 0 0 0
             </pose>
 			<inertial>
 				<pose>0 0 -0.055 0 0 0</pose>
@@ -247,18 +248,18 @@
 			<parent>left_front_hip_inner</parent>
 			<child>left_front_hip</child>
 			<pose relative_to="left_front_hip_inner">
-                0.01 0.01 0 0 0 0
+                0.025 0.043 0 0 0 0
             </pose>
 			<axis>
-				<xyz>0. 1. 0.</xyz>
+				<xyz>0. -1. 0.</xyz>
 				<limit>
-					<lower>-3.1415</lower>
-					<upper>0</upper>
+					<lower>-1.57075</lower>
+					<upper>0.785375</upper>
 					<effort>1.96</effort>
 					<!-- velocity limits not enforced by drake -->
 				</limit>
 				<dynamics>
-					<damping>0.01</damping>
+					<damping>1.5e-2</damping>
 				</dynamics>
 			</axis>
 			<drake:rotor_inertia>1e-7</drake:rotor_inertia>
@@ -325,15 +326,15 @@
             </pose>
 			<axis>
 				<!-- axis is in child frame -->
-				<xyz>0 1. 0</xyz>
+				<xyz>0 -1. 0</xyz>
 				<limit>
-					<lower>-3.1415</lower>
-					<upper>0</upper>
+					<lower>0.2617916666666667</lower>
+					<upper>3.1415</upper>
 					<effort>1.96</effort>
 					<!-- velocity limits not enforced by drake -->
 				</limit>
 				<dynamics>
-					<damping>0.01</damping>
+					<damping>1.5e-2</damping>
 				</dynamics>
 			</axis>
 			<drake:rotor_inertia>1e-7</drake:rotor_inertia>
@@ -342,7 +343,7 @@
 		<!-- Pelvis -->
 		<link name="right_front_pelvis">
 			<pose relative_to="body">
-                0.2 0 0 0 0 0
+                0.12 0 0 0 0 0
             </pose>
 			<inertial>
 				<pose>0 0 0 0 0 0</pose>
@@ -358,11 +359,11 @@
 			</inertial>
 			<visual name="right_front_pelvis_rod_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0 -0.05 0 1.57075 0 0 </pose>
+				<pose> 0 -0.025 0.038 1.57075 0 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.005</radius>
-						<length>0.1</length>
+						<length>0.05</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -371,7 +372,7 @@
 				</material>
 			</visual>
 			<visual name="right_front_pelvis_ball_visual">
-				<pose>0 -0.1 0 0 0 0 </pose>
+				<pose>0 -0.05 0.038 0 0 0 </pose>
 				<geometry>
 					<sphere>
 						<radius>0.01</radius>
@@ -387,36 +388,36 @@
 			<parent>body</parent>
 			<child>right_front_pelvis</child>
 			<pose relative_to="body">
-                0.2 0 0 0 0 0
+                0.12 0 0 0 0 0
             </pose>
 		</joint>
 		<!-- hip abduction-->
 		<link name="right_front_hip_inner">
 			<pose relative_to="right_front_pelvis">
-                0 -0.1 0 0 0 0
+                0 -0.05 0.038 0 0 0
             </pose>
 			<inertial>
 				<!-- Guessing the massive servos pull the COM to right between them -->
-				<pose>-0.01 -0.01 0 0 0 0</pose>
+				<pose>-0.025 -0.043 0 0 0 0</pose>
 				<!-- approx standin inertia -->
-				<mass>0.1</mass>
+				<mass>0.25</mass>
 				<inertia>
-					<ixx>9.895833333333333e-07</ixx>
+					<ixx>1.3411458333333335e-05</ixx>
 					<ixy>0</ixy>
 					<ixz>0</ixz>
-					<iyy>9.895833333333333e-07</iyy>
+					<iyy>1.3411458333333335e-05</iyy>
 					<iyz>0</iyz>
-					<izz>3.125e-07</izz>
+					<izz>7.8125e-07</izz>
 				</inertia>
-				<mass>0.1</mass>
+				<mass>0.25</mass>
 			</inertial>
 			<visual name="right_front_inner_hip_rod_x_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0.01/2 0 0 0 1.57075 0 </pose>
+				<pose> 0.025/2 0 0 0 1.57075 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.0025</radius>
-						<length>0.01</length>
+						<length>0.025</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -426,11 +427,11 @@
 			</visual>
 			<visual name="right_front_inner_hip_rod_y_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0.01 -0.005 0 1.57075 0 0 </pose>
+				<pose> 0.025 -0.0215 0 1.57075 0 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.0025</radius>
-						<length>0.01</length>
+						<length>0.043</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -439,7 +440,7 @@
 				</material>
 			</visual>
 			<visual name="right_front_inner_hip_ball_visual">
-				<pose>0.01 -0.01 0 0 0 0 </pose>
+				<pose>0.025 -0.043 0 0 0 0 </pose>
 				<geometry>
 					<sphere>
 						<radius>0.01</radius>
@@ -451,7 +452,7 @@
 				</material>
 			</visual>
 			<visual name="right_front_inner_hip_box_visual">
-				<pose>0.005 -0.005 0 0 0 0</pose>
+				<pose>0.0125 -0.0215 0 0 0 0</pose>
 				<geometry>
 					<box>
 						<size>0.04 0.04 0.04</size>
@@ -467,10 +468,10 @@
 			<parent>right_front_pelvis</parent>
 			<child>right_front_hip_inner</child>
 			<pose relative_to="right_front_pelvis">
-                0 -0.1 0. 0. 0. 0
+                0 -0.05 0.038 0. 0. 0
             </pose>
 			<axis>
-				<xyz>1. 0. 0.</xyz>
+				<xyz>-1.0 0. 0.</xyz>
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
@@ -478,7 +479,7 @@
 					<!-- velocity limits not enforced by drake -->
 				</limit>
 				<dynamics>
-					<damping>0.01</damping>
+					<damping>1.5e-2</damping>
 				</dynamics>
 			</axis>
 			<drake:rotor_inertia>1e-7</drake:rotor_inertia>
@@ -488,7 +489,7 @@
 		<link name="right_front_hip">
 			<!-- Goes straight down at base posture -->
 			<pose relative_to="right_front_hip_inner">
-                0.01 -0.01 0 0 0 0
+                0.025 -0.043 0 0 0 0
             </pose>
 			<inertial>
 				<pose>0 0 -0.055 0 0 0</pose>
@@ -541,18 +542,18 @@
 			<parent>right_front_hip_inner</parent>
 			<child>right_front_hip</child>
 			<pose relative_to="right_front_hip_inner">
-                0.01 -0.01 0 0 0 0
+                0.025 -0.043 0 0 0 0
             </pose>
 			<axis>
-				<xyz>0. 1. 0.</xyz>
+				<xyz>0. -1. 0.</xyz>
 				<limit>
-					<lower>-3.1415</lower>
-					<upper>0</upper>
+					<lower>-1.57075</lower>
+					<upper>0.785375</upper>
 					<effort>1.96</effort>
 					<!-- velocity limits not enforced by drake -->
 				</limit>
 				<dynamics>
-					<damping>0.01</damping>
+					<damping>1.5e-2</damping>
 				</dynamics>
 			</axis>
 			<drake:rotor_inertia>1e-7</drake:rotor_inertia>
@@ -619,15 +620,15 @@
             </pose>
 			<axis>
 				<!-- axis is in child frame -->
-				<xyz>0 1. 0</xyz>
+				<xyz>0 -1. 0</xyz>
 				<limit>
-					<lower>-3.1415</lower>
-					<upper>0</upper>
+					<lower>0.2617916666666667</lower>
+					<upper>3.1415</upper>
 					<effort>1.96</effort>
 					<!-- velocity limits not enforced by drake -->
 				</limit>
 				<dynamics>
-					<damping>0.01</damping>
+					<damping>1.5e-2</damping>
 				</dynamics>
 			</axis>
 			<drake:rotor_inertia>1e-7</drake:rotor_inertia>
@@ -636,7 +637,7 @@
 		<!-- Pelvis -->
 		<link name="left_back_pelvis">
 			<pose relative_to="body">
-                -0.2 0 0 0 0 0
+                -0.175 0 0 0 0 0
             </pose>
 			<inertial>
 				<pose>0 0 0 0 0 0</pose>
@@ -652,11 +653,11 @@
 			</inertial>
 			<visual name="left_back_pelvis_rod_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0 0.05 0 1.57075 0 0 </pose>
+				<pose> 0 0.025 0.038 1.57075 0 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.005</radius>
-						<length>0.1</length>
+						<length>0.05</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -665,7 +666,7 @@
 				</material>
 			</visual>
 			<visual name="left_back_pelvis_ball_visual">
-				<pose>0 0.1 0 0 0 0 </pose>
+				<pose>0 0.05 0.038 0 0 0 </pose>
 				<geometry>
 					<sphere>
 						<radius>0.01</radius>
@@ -681,36 +682,36 @@
 			<parent>body</parent>
 			<child>left_back_pelvis</child>
 			<pose relative_to="body">
-                -0.2 0 0 0 0 0
+                -0.175 0 0 0 0 0
             </pose>
 		</joint>
 		<!-- hip abduction-->
 		<link name="left_back_hip_inner">
 			<pose relative_to="left_back_pelvis">
-                0 0.1 0 0 0 0
+                0 0.05 0.038 0 0 0
             </pose>
 			<inertial>
 				<!-- Guessing the massive servos pull the COM to right between them -->
-				<pose>-0.01 0.01 0 0 0 0</pose>
+				<pose>-0.025 0.043 0 0 0 0</pose>
 				<!-- approx standin inertia -->
-				<mass>0.1</mass>
+				<mass>0.25</mass>
 				<inertia>
-					<ixx>9.895833333333333e-07</ixx>
+					<ixx>1.3411458333333335e-05</ixx>
 					<ixy>0</ixy>
 					<ixz>0</ixz>
-					<iyy>9.895833333333333e-07</iyy>
+					<iyy>1.3411458333333335e-05</iyy>
 					<iyz>0</iyz>
-					<izz>3.125e-07</izz>
+					<izz>7.8125e-07</izz>
 				</inertia>
-				<mass>0.1</mass>
+				<mass>0.25</mass>
 			</inertial>
 			<visual name="left_back_inner_hip_rod_x_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0.01/2 0 0 0 1.57075 0 </pose>
+				<pose> 0.025/2 0 0 0 1.57075 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.0025</radius>
-						<length>0.01</length>
+						<length>0.025</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -720,11 +721,11 @@
 			</visual>
 			<visual name="left_back_inner_hip_rod_y_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0.01 0.005 0 1.57075 0 0 </pose>
+				<pose> 0.025 0.0215 0 1.57075 0 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.0025</radius>
-						<length>0.01</length>
+						<length>0.043</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -733,7 +734,7 @@
 				</material>
 			</visual>
 			<visual name="left_back_inner_hip_ball_visual">
-				<pose>0.01 0.01 0 0 0 0 </pose>
+				<pose>0.025 0.043 0 0 0 0 </pose>
 				<geometry>
 					<sphere>
 						<radius>0.01</radius>
@@ -745,7 +746,7 @@
 				</material>
 			</visual>
 			<visual name="left_back_inner_hip_box_visual">
-				<pose>0.005 0.005 0 0 0 0</pose>
+				<pose>0.0125 0.0215 0 0 0 0</pose>
 				<geometry>
 					<box>
 						<size>0.04 0.04 0.04</size>
@@ -761,10 +762,10 @@
 			<parent>left_back_pelvis</parent>
 			<child>left_back_hip_inner</child>
 			<pose relative_to="left_back_pelvis">
-                0 0.1 0. 0. 0. 0
+                0 0.05 0.038 0. 0. 0
             </pose>
 			<axis>
-				<xyz>1. 0. 0.</xyz>
+				<xyz>1.0 0. 0.</xyz>
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
@@ -772,7 +773,7 @@
 					<!-- velocity limits not enforced by drake -->
 				</limit>
 				<dynamics>
-					<damping>0.01</damping>
+					<damping>1.5e-2</damping>
 				</dynamics>
 			</axis>
 			<drake:rotor_inertia>1e-7</drake:rotor_inertia>
@@ -782,7 +783,7 @@
 		<link name="left_back_hip">
 			<!-- Goes straight down at base posture -->
 			<pose relative_to="left_back_hip_inner">
-                0.01 0.01 0 0 0 0
+                0.025 0.043 0 0 0 0
             </pose>
 			<inertial>
 				<pose>0 0 -0.055 0 0 0</pose>
@@ -835,18 +836,18 @@
 			<parent>left_back_hip_inner</parent>
 			<child>left_back_hip</child>
 			<pose relative_to="left_back_hip_inner">
-                0.01 0.01 0 0 0 0
+                0.025 0.043 0 0 0 0
             </pose>
 			<axis>
-				<xyz>0. 1. 0.</xyz>
+				<xyz>0. -1. 0.</xyz>
 				<limit>
-					<lower>-3.1415</lower>
-					<upper>0</upper>
+					<lower>-1.57075</lower>
+					<upper>0.785375</upper>
 					<effort>1.96</effort>
 					<!-- velocity limits not enforced by drake -->
 				</limit>
 				<dynamics>
-					<damping>0.01</damping>
+					<damping>1.5e-2</damping>
 				</dynamics>
 			</axis>
 			<drake:rotor_inertia>1e-7</drake:rotor_inertia>
@@ -913,15 +914,15 @@
             </pose>
 			<axis>
 				<!-- axis is in child frame -->
-				<xyz>0 1. 0</xyz>
+				<xyz>0 -1. 0</xyz>
 				<limit>
-					<lower>-3.1415</lower>
-					<upper>0</upper>
+					<lower>0.2617916666666667</lower>
+					<upper>3.1415</upper>
 					<effort>1.96</effort>
 					<!-- velocity limits not enforced by drake -->
 				</limit>
 				<dynamics>
-					<damping>0.01</damping>
+					<damping>1.5e-2</damping>
 				</dynamics>
 			</axis>
 			<drake:rotor_inertia>1e-7</drake:rotor_inertia>
@@ -930,7 +931,7 @@
 		<!-- Pelvis -->
 		<link name="right_back_pelvis">
 			<pose relative_to="body">
-                -0.2 0 0 0 0 0
+                -0.175 0 0 0 0 0
             </pose>
 			<inertial>
 				<pose>0 0 0 0 0 0</pose>
@@ -946,11 +947,11 @@
 			</inertial>
 			<visual name="right_back_pelvis_rod_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0 -0.05 0 1.57075 0 0 </pose>
+				<pose> 0 -0.025 0.038 1.57075 0 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.005</radius>
-						<length>0.1</length>
+						<length>0.05</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -959,7 +960,7 @@
 				</material>
 			</visual>
 			<visual name="right_back_pelvis_ball_visual">
-				<pose>0 -0.1 0 0 0 0 </pose>
+				<pose>0 -0.05 0.038 0 0 0 </pose>
 				<geometry>
 					<sphere>
 						<radius>0.01</radius>
@@ -975,36 +976,36 @@
 			<parent>body</parent>
 			<child>right_back_pelvis</child>
 			<pose relative_to="body">
-                -0.2 0 0 0 0 0
+                -0.175 0 0 0 0 0
             </pose>
 		</joint>
 		<!-- hip abduction-->
 		<link name="right_back_hip_inner">
 			<pose relative_to="right_back_pelvis">
-                0 -0.1 0 0 0 0
+                0 -0.05 0.038 0 0 0
             </pose>
 			<inertial>
 				<!-- Guessing the massive servos pull the COM to right between them -->
-				<pose>-0.01 -0.01 0 0 0 0</pose>
+				<pose>-0.025 -0.043 0 0 0 0</pose>
 				<!-- approx standin inertia -->
-				<mass>0.1</mass>
+				<mass>0.25</mass>
 				<inertia>
-					<ixx>9.895833333333333e-07</ixx>
+					<ixx>1.3411458333333335e-05</ixx>
 					<ixy>0</ixy>
 					<ixz>0</ixz>
-					<iyy>9.895833333333333e-07</iyy>
+					<iyy>1.3411458333333335e-05</iyy>
 					<iyz>0</iyz>
-					<izz>3.125e-07</izz>
+					<izz>7.8125e-07</izz>
 				</inertia>
-				<mass>0.1</mass>
+				<mass>0.25</mass>
 			</inertial>
 			<visual name="right_back_inner_hip_rod_x_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0.01/2 0 0 0 1.57075 0 </pose>
+				<pose> 0.025/2 0 0 0 1.57075 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.0025</radius>
-						<length>0.01</length>
+						<length>0.025</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -1014,11 +1015,11 @@
 			</visual>
 			<visual name="right_back_inner_hip_rod_y_visual">
 				<!-- Cylinders are along +z -->
-				<pose> 0.01 -0.005 0 1.57075 0 0 </pose>
+				<pose> 0.025 -0.0215 0 1.57075 0 0 </pose>
 				<geometry>
 					<cylinder>
 						<radius>0.0025</radius>
-						<length>0.01</length>
+						<length>0.043</length>
 					</cylinder>
 				</geometry>
 				<material>
@@ -1027,7 +1028,7 @@
 				</material>
 			</visual>
 			<visual name="right_back_inner_hip_ball_visual">
-				<pose>0.01 -0.01 0 0 0 0 </pose>
+				<pose>0.025 -0.043 0 0 0 0 </pose>
 				<geometry>
 					<sphere>
 						<radius>0.01</radius>
@@ -1039,7 +1040,7 @@
 				</material>
 			</visual>
 			<visual name="right_back_inner_hip_box_visual">
-				<pose>0.005 -0.005 0 0 0 0</pose>
+				<pose>0.0125 -0.0215 0 0 0 0</pose>
 				<geometry>
 					<box>
 						<size>0.04 0.04 0.04</size>
@@ -1055,10 +1056,10 @@
 			<parent>right_back_pelvis</parent>
 			<child>right_back_hip_inner</child>
 			<pose relative_to="right_back_pelvis">
-                0 -0.1 0. 0. 0. 0
+                0 -0.05 0.038 0. 0. 0
             </pose>
 			<axis>
-				<xyz>1. 0. 0.</xyz>
+				<xyz>-1.0 0. 0.</xyz>
 				<limit>
 					<lower>-1.57075</lower>
 					<upper>1.57075</upper>
@@ -1066,7 +1067,7 @@
 					<!-- velocity limits not enforced by drake -->
 				</limit>
 				<dynamics>
-					<damping>0.01</damping>
+					<damping>1.5e-2</damping>
 				</dynamics>
 			</axis>
 			<drake:rotor_inertia>1e-7</drake:rotor_inertia>
@@ -1076,7 +1077,7 @@
 		<link name="right_back_hip">
 			<!-- Goes straight down at base posture -->
 			<pose relative_to="right_back_hip_inner">
-                0.01 -0.01 0 0 0 0
+                0.025 -0.043 0 0 0 0
             </pose>
 			<inertial>
 				<pose>0 0 -0.055 0 0 0</pose>
@@ -1129,18 +1130,18 @@
 			<parent>right_back_hip_inner</parent>
 			<child>right_back_hip</child>
 			<pose relative_to="right_back_hip_inner">
-                0.01 -0.01 0 0 0 0
+                0.025 -0.043 0 0 0 0
             </pose>
 			<axis>
-				<xyz>0. 1. 0.</xyz>
+				<xyz>0. -1. 0.</xyz>
 				<limit>
-					<lower>-3.1415</lower>
-					<upper>0</upper>
+					<lower>-1.57075</lower>
+					<upper>0.785375</upper>
 					<effort>1.96</effort>
 					<!-- velocity limits not enforced by drake -->
 				</limit>
 				<dynamics>
-					<damping>0.01</damping>
+					<damping>1.5e-2</damping>
 				</dynamics>
 			</axis>
 			<drake:rotor_inertia>1e-7</drake:rotor_inertia>
@@ -1207,15 +1208,15 @@
             </pose>
 			<axis>
 				<!-- axis is in child frame -->
-				<xyz>0 1. 0</xyz>
+				<xyz>0 -1. 0</xyz>
 				<limit>
-					<lower>-3.1415</lower>
-					<upper>0</upper>
+					<lower>0.2617916666666667</lower>
+					<upper>3.1415</upper>
 					<effort>1.96</effort>
 					<!-- velocity limits not enforced by drake -->
 				</limit>
 				<dynamics>
-					<damping>0.01</damping>
+					<damping>1.5e-2</damping>
 				</dynamics>
 			</axis>
 			<drake:rotor_inertia>1e-7</drake:rotor_inertia>
