@@ -13,7 +13,7 @@ from pydrake.math import RigidTransform, RotationMatrix
 from pydrake.systems.framework import DiagramBuilder
 from pydrake.systems.analysis import Simulator
 from pydrake.systems.meshcat_visualizer import MeshcatVisualizer
-from pydrake.systems.primitives import FirstOrderLowPassFilter, SignalLogger
+from pydrake.systems.primitives import ConstantVectorSource, FirstOrderLowPassFilter, SignalLogger
 from pydrake.all import MultibodyPlant, SceneGraph, Parser, FindResourceOrThrow, ConnectMeshcatVisualizer, JointSliders
 from pydrake.systems.rendering import MultibodyPositionToGeometryPose
 
@@ -26,7 +26,7 @@ def main():
 
     builder = DiagramBuilder()
     scene_graph = builder.AddSystem(SceneGraph())
-    plant = MultibodyPlant(time_step=0.0)
+    plant = MultibodyPlant(time_step=0.01)
     plant.RegisterAsSourceForSceneGraph(scene_graph)
     parser = Parser(plant)
     model = parser.AddModelFromFile(args.sdf_path)
@@ -40,12 +40,14 @@ def main():
     if args.interactive:
         # Add sliders to set positions of the joints.
         sliders = builder.AddSystem(JointSliders(robot=plant))
-        to_pose = builder.AddSystem(MultibodyPositionToGeometryPose(plant))
-        builder.Connect(sliders.get_output_port(0), to_pose.get_input_port())
-        builder.Connect(
-            to_pose.get_output_port(),
-            scene_graph.get_source_pose_port(plant.get_source_id()))
-
+    else:
+        q0 = plant.GetPositions(plant.CreateDefaultContext())
+        sliders = builder.AddSystem(ConstantVectorSource(q0))
+    to_pose = builder.AddSystem(MultibodyPositionToGeometryPose(plant))
+    builder.Connect(sliders.get_output_port(0), to_pose.get_input_port())
+    builder.Connect(
+        to_pose.get_output_port(),
+        scene_graph.get_source_pose_port(plant.get_source_id()))
 
     diagram = builder.Build()
     simulator = Simulator(diagram)
