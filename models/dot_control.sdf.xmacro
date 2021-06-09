@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<sdf version="1.7" xmlns:drake="http://drake.mit.edu">
+<sdf version="1.6" xmlns:drake="http://drake.mit.edu">
     <!-- Robot dimensions, all units meters.
         FORWARD IS +X
         LEFT IS +Y

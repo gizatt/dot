@@ -14,4 +14,7 @@ due_update: rosserial_setup due_build due_reset due_flash
 catkin:
 	cd catkin && touch src/dot_msgs/CMakeLists.txt && catkin_make
 
+sdf:
+	xacro4sdf ./models/dot_control.sdf.xmacro
+
 .PHONY: rosserial_setup catkin
