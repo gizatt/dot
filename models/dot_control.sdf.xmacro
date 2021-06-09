@@ -104,7 +104,7 @@
             </inertial>
             <visual name="${prefix}_inner_hip_rod_x_visual">
                 <!-- Cylinders are along +z -->
-                <pose> ${hip_x}/2 0 0 0 ${pi/2.} 0 </pose>
+                <pose> ${hip_x/2} 0 0 0 ${pi/2.} 0 </pose>
                 <xacro_macro name="geometry_cylinder" r="0.0025" l="${hip_x}"/>
                 <xacro_macro name="color" color="${color}"/>
             </visual>
