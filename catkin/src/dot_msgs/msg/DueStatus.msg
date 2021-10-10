@@ -1,3 +1,3 @@
 std_msgs/Header header
-float64 update_rate
-float64 last_servo_update_time
+float64 average_update_rate
+sensor_msgs/JointState last_command

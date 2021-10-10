@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   geometry_msgs
+  sensor_msgs
   message_generation
 )
 
@@ -51,7 +52,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
+  ServoSetTrajectory.msg
   LocomotionServerStatus.msg
+  DueStatus.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -73,6 +76,7 @@ generate_messages(
    DEPENDENCIES
    std_msgs
    geometry_msgs
+   sensor_msgs
 )
 
 ################################################
