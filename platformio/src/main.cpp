@@ -9,6 +9,7 @@
 #include "ros.h"
 #include <std_msgs/Float32.h>
 #include <std_msgs/Header.h>
+#include "dot_msgs/DueStatus.h"
 #include <stdio.h>
 #include <stdarg.h>
 

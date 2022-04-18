@@ -1,16 +1,17 @@
 
-rosserial_setup:
-	rosrun rosserial_arduino make_libraries.py src/due/build/ catkin/src/dot_msgs
-	patch src/due/build/ros_lib/ros/node_handle.h src/due/node_handle_patch.diff
+# Sentinel only rebuilds the message types when the files have changed.
+build/rosserial_setup.sentinel: $(shell find catkin/src/dot_msgs -type f)
+	mkdir -p build
+	touch build/rosserial_setup.sentinel
+rosserial_setup: build/rosserial_setup.sentinel
+	rosrun rosserial_arduino make_libraries.py build/tmp catkin/src/dot_msgs
+	rm -rf platformio/include/dot_msgs && cp -r build/tmp/ros_lib/dot_msgs platformio/include/dot_msgs
 
-due_build:
-	arduino-cli compile --library $(realpath src/due/build/ros_lib) --fqbn arduino:sam:arduino_due_x_dbg -e src/due
-due_flash:
-	arduino-cli upload -p $(port) --fqbn arduino:sam:arduino_due_x_dbg src/due
-due_reset:
-	stty -F $(port) 1200
-	sleep 1
-due_update: due_build due_reset due_flash
+speck_build: build/rosserial_setup.sentinel
+	cd platformio && pio run
+speck_flash: build/rosserial_setup.sentinel
+	cd platformio && pio run --target upload
+speck_update: speck_flash
 
 catkin:
 	cd catkin && touch src/dot_msgs/CMakeLists.txt && catkin_make
