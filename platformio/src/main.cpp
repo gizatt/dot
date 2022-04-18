@@ -6,28 +6,52 @@
  */
 #include "Arduino.h"
 
-#include <ros.h>
+#include "ros.h"
 #include <std_msgs/Float32.h>
-#include <std_msgs/String.h>
+#include <std_msgs/Header.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 ros::NodeHandle nh;
-
-std_msgs::String str_msg;
-ros::Publisher chatter("chatter", &str_msg);
-
-const int STR_LEN = 1000;
-char hello[STR_LEN];
 
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 13
 #endif
+
+class DebugStrPublisher {
+    /*
+     * Packs timestamped debug strs into a Header msg,
+     * putting the debug str into the frame_id string field.
+     */ 
+    public:
+        const static int BUF_LEN = 1000;
+        DebugStrPublisher(ros::NodeHandle& nh) :
+                m_nh(nh),
+                m_pub("speck/debug", &m_msg){
+            nh.advertise(m_pub);
+        }
+        template <typename ... Args>
+        void log(Args&& ... args){
+            snprintf(m_buf, BUF_LEN, args ...);
+            m_msg.stamp = m_nh.now();
+            m_msg.frame_id = m_buf;
+            m_pub.publish( &m_msg );
+        }
+
+    private:
+        ros::NodeHandle& m_nh;
+        std_msgs::Header m_msg;
+        ros::Publisher m_pub;
+        char m_buf[BUF_LEN];
+};
+DebugStrPublisher * debugPublisher;
 
 class CurrentSensor {
     public:
         const int A2D_CURRENT_PIN = 24;
         const double MAX_CURRENT = 50; // Amps
         const double MAX_CURRENT_RAW = 1024; // AnalogRead output unit
-        const double UPDATE_PERIOD = 0.00000001;
+        const double UPDATE_PERIOD = 0.01;
         CurrentSensor(ros::NodeHandle& nh) :
                 m_pub("speck/current", &m_float_msg){
             m_last_update_t = nh.now();
@@ -37,8 +61,7 @@ class CurrentSensor {
         void update(ros::Time t){
             if (t.toSec() - m_last_update_t.toSec() > UPDATE_PERIOD){
                 m_last_update_t = t;
-                //double val = (double)analogRead(A2D_CURRENT_PIN);
-                double val = 0.;
+                double val = (double)analogRead(A2D_CURRENT_PIN);
                 m_float_msg.data = MAX_CURRENT * (val /  MAX_CURRENT_RAW);
                 m_pub.publish( &m_float_msg );
             }
@@ -81,6 +104,7 @@ class LEDBlinker {
 
 CurrentSensor * currentSensor;
 LEDBlinker * blinker;
+
 void setup()
 {
   // initialize LED digital pin as an output.
@@ -88,26 +112,19 @@ void setup()
   
   nh.getHardware()->setBaud(9800);
   nh.initNode();
-  nh.advertise(chatter);
 
   blinker = new LEDBlinker(nh, LED_BUILTIN);
   currentSensor = new CurrentSensor(nh);
+  debugPublisher = new DebugStrPublisher(nh);
 
-  for (int i = 0; i < STR_LEN; i++){
-      hello[i] = 'A' + (i%25);
-  }
-  hello[STR_LEN-1] = 0;
+  debugPublisher->log("Initialized.");
 }
 
 void loop()
 {
   auto t = nh.now();
 
-  //currentSensor->update(t);
+  currentSensor->update(t);
   blinker->update(t);
-
-  str_msg.data = hello;
-  chatter.publish(&str_msg);
-  
   nh.spinOnce();
 }
