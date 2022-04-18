@@ -71,6 +71,20 @@ cd BOSSA-1.6.1-arduino && ./arduino/make_package.sh
 sudo cp bin/bossac /usr/local/bin/bossac
 ```
 
+## Teensy + Arduino + rosserial
+
+# PlatformIO route:
+```
+python3 -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/master/scripts/get-platformio.py)"
+export PATH=$PATH:$HOME/.platformio/penv/bin # Put in bashrc
+```
+
+Build + upload:
+```
+pio run
+pio run --target upload
+```
+
 
 ## Arduino-cli
 Install:
