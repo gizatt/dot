@@ -54,7 +54,7 @@ add_message_files(
   FILES
   ServoSetTrajectory.msg
   LocomotionServerStatus.msg
-  DueStatus.msg
+  SpeckStatus.msg
 )
 
 ## Generate services in the 'srv' folder

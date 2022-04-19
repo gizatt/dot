@@ -1,3 +1,4 @@
 std_msgs/Header header
-float64 average_update_rate
+float32 average_loop_rate
+float32 battery_current
 sensor_msgs/JointState last_command
