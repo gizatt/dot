@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ros.h"
 #include <std_msgs/Header.h>
 

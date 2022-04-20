@@ -15,6 +15,7 @@
 #include "LEDBlinker.hpp"
 #include "CurrentSensor.hpp"
 #include "StatusSender.hpp"
+#include "IMUST.hpp"
 
 ros::NodeHandle nh;
 
@@ -27,19 +28,21 @@ ros::NodeHandle nh;
 CurrentSensor *current_sensor;
 LEDBlinker *blinker;
 StatusSender *status_sender;
+IMUST *imu_st;
 
 void setup()
 {
     // initialize LED digital pin as an output.
-    pinMode(LED_BUILTIN, OUTPUT);
+    //pinMode(LED_BUILTIN, OUTPUT);
 
     nh.getHardware()->setBaud(9800);
     nh.initNode();
 
     create_debug_publisher_singleton(nh);
-    blinker = new LEDBlinker(nh, LED_BUILTIN);
+    //blinker = new LEDBlinker(nh, LED_BUILTIN);
     current_sensor = new CurrentSensor(nh, A2D_CURRENT_PIN);
-    status_sender = new StatusSender(nh, current_sensor);
+    imu_st = new IMUST(nh);
+    status_sender = new StatusSender(nh, current_sensor, imu_st);
     debugPublisherSingleton->log("Initialized.");
 }
 
@@ -49,7 +52,8 @@ void loop()
 
     { // Update all modules.
         current_sensor->update(t);
-        blinker->update(t);
+        //blinker->update(t);
+        imu_st->update(t);
         status_sender->update(t);
         nh.spinOnce();
     }

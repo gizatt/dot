@@ -2,3 +2,7 @@ std_msgs/Header header
 float32 average_loop_rate
 float32 battery_current
 sensor_msgs/JointState last_command
+bool has_imu
+float32[3] imu_acc
+float32[3] imu_gyro
+float32 imu_temp
