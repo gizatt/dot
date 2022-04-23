@@ -16,6 +16,7 @@
 #include "CurrentSensor.hpp"
 #include "StatusSender.hpp"
 #include "IMUST.hpp"
+#include "ServoSetController.hpp"
 
 ros::NodeHandle nh;
 
@@ -25,10 +26,12 @@ ros::NodeHandle nh;
 
 #define A2D_CURRENT_PIN 24
 
+DebugStrPublisher *debug_publisher;
 CurrentSensor *current_sensor;
 LEDBlinker *blinker;
 StatusSender *status_sender;
 IMUST *imu_st;
+ServoSetController *servo_set_controller;
 
 void setup()
 {
@@ -38,12 +41,17 @@ void setup()
     nh.getHardware()->setBaud(9800);
     nh.initNode();
 
-    create_debug_publisher_singleton(nh);
-    //blinker = new LEDBlinker(nh, LED_BUILTIN);
+    while (!nh.connected())
+    {
+        nh.spinOnce();
+    }
+
+    debug_publisher = new DebugStrPublisher(nh);
     current_sensor = new CurrentSensor(nh, A2D_CURRENT_PIN);
-    imu_st = new IMUST(nh);
-    status_sender = new StatusSender(nh, current_sensor, imu_st);
-    debugPublisherSingleton->log("Initialized.");
+    imu_st = new IMUST(nh, debug_publisher);
+    servo_set_controller = new ServoSetController(nh, debug_publisher);
+    status_sender = new StatusSender(nh, current_sensor, imu_st, servo_set_controller, debug_publisher);
+    debug_publisher->log("Initialized.");
 }
 
 void loop()
@@ -55,6 +63,7 @@ void loop()
         //blinker->update(t);
         imu_st->update(t);
         status_sender->update(t);
+        servo_set_controller->update(t);
         nh.spinOnce();
     }
 }

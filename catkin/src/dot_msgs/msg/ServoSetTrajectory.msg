@@ -9,7 +9,7 @@
 # rosserial has been choking on "cleaner" array-of-array messages,
 # and serial bandwidth is very precious.
 std_msgs/Header header
-int16 num_positions
-int16 num_breaks
+uint16 num_positions
+uint16 num_breaks
 float32[] breaks_from_start
 int16[] data

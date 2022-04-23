@@ -15,7 +15,7 @@ public:
     const double UPDATE_PERIOD = 0.01;
     const double RECONNECT_PERIOD = 1.0;
 
-    IMUST(ros::NodeHandle &nh) : m_have_imu(false), m_last_update_t(nh.now())
+    IMUST(ros::NodeHandle &nh, DebugStrPublisher *debug_publisher = nullptr) : m_debug_publisher(debug_publisher), m_have_imu(false), m_last_update_t(nh.now())
     {
         pinMode(PIN_CS, OUTPUT);
         SPI.begin();
@@ -30,9 +30,9 @@ public:
     bool try_connect()
     {
         m_have_imu = m_sox.begin_SPI(PIN_CS, &SPI);
-        if (!m_have_imu && debugPublisherSingleton)
+        if (!m_have_imu && m_debug_publisher)
         {
-            debugPublisherSingleton->log("Could not connect to IMU.");
+            m_debug_publisher->log("Could not connect to IMU.");
         }
         return m_have_imu;
     }
@@ -74,6 +74,7 @@ public:
     }
 
 private:
+    DebugStrPublisher *m_debug_publisher;
     bool m_have_imu;
     ros::Time m_last_update_t;
     Adafruit_LSM6DSOX m_sox;
