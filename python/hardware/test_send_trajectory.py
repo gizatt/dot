@@ -1,10 +1,16 @@
 #!/usr/bin/env python
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
 import rospy
 import numpy as np
 import time
 import random
 import sys
 from dot_msgs.msg import ServoSetTrajectory
+
+
 
 def talker():
     pub = rospy.Publisher('speck/joint_trajectory_cmd', ServoSetTrajectory, queue_size=1)
@@ -26,6 +32,10 @@ def talker():
     test_trajectory_msg.data = data.flatten().tolist()
     durs = np.linspace(1, 0.2, nb) ** 2.
     test_trajectory_msg.breaks_from_start = np.cumsum(durs)
+    plt.plot(test_trajectory_msg.breaks_from_start, data)
+    plt.xlabel("t(s)")
+    plt.ylabel("Joint cmd")
+    plt.savefig('test.png')
     pub.publish(test_trajectory_msg)
 
 if __name__ == '__main__':
