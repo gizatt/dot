@@ -9,8 +9,7 @@ import logging
 import yaml
 
 import rospy
-from ros_utils import convert_np_vector_to_int16_multi_array
-from std_msgs.msg import Int16MultiArray
+from dot_msgs.msg import ServoSetTrajectory
 
 
 class ServoInfo:
@@ -113,7 +112,7 @@ class HardwareInterface():
             self.q_inds_per_leg.append(q_inds_for_leg)
             self.us_inds_per_leg.append(us_inds_for_leg)
 
-        self.pub = rospy.Publisher('motor_command', Int16MultiArray, queue_size=1)
+        self.pub = rospy.Publisher('speck/joint_trajectory_cmd', ServoSetTrajectory, queue_size=1)
 
         self.curr_pose = q0
         self.curr_us, _ = self.convert_pose_to_us(q0)
@@ -140,12 +139,7 @@ class HardwareInterface():
         us_candidate, required_projection = self.convert_pose_to_us(q)
         if allow_projection is False and required_projection is True:
             return False
-        self.curr_pose = q
-        self.curr_us = us_candidate
-        self.pub.publish(
-            convert_np_vector_to_int16_multi_array(
-                self.curr_us
-        ))
+        self.send_us(us_candidate)
         return True
 
     def send_us(self, us):
@@ -153,9 +147,18 @@ class HardwareInterface():
         assert us.shape == (16,)
         self.curr_us = us
         self.curr_pose = self.convert_us_to_pose(us)
-        self.pub.publish(
-            convert_np_vector_to_int16_multi_array(us)
-        )
+    
+        trajectory_msg = ServoSetTrajectory()
+        trajectory_msg.header.stamp = rospy.Time.now()
+        nq = 16
+        nb = 1
+        trajectory_msg.num_positions = nq
+        trajectory_msg.num_breaks = nb
+        data = np.zeros((nb, nq), dtype=np.int16) - 1
+        data[0, :] = us
+        trajectory_msg.breaks_from_start = [0.]
+        trajectory_msg.data = data.flatten().tolist()    
+        self.pub.publish(trajectory_msg)
 
 def main():
     with open("servo_config.yaml") as f:
