@@ -23,11 +23,11 @@ def vector3_from_np(vec):
     return Vector3(vec[0], vec[1], vec[2])
 
 class Walker():
-    # Manages walking state machine: cycle through feet in LF/RR/LR/RF order,
+    # Manages walking state machine: cycle through feet in LR/LF/RR/RF order,
     # shifting COM to center of stance feet, picking up foot, moving it forward a few cm,
     # and putting it down.
 
-    def __init__(self, com_height=0.15, com_slew_size=0.005, foot_slew_size=0.005, forward_step_size=0.025, foot_lift_amount=0.05):
+    def __init__(self, com_height=0.15, com_slew_size=0.25, com_shift_frac=0.1, foot_slew_size=0.05, forward_step_size=0.1, foot_lift_amount=0.02):
         self.curr_robot_state = None
         self.curr_feet_positions = None
         self.curr_stance_status = None
@@ -45,7 +45,7 @@ class Walker():
         rospy.wait_for_service('/locomotion_server_move_foot')
 
         self.foot_ordering = [
-            "left_front_leg", "right_rear_leg", "right_front_leg", "left_rear_leg"
+            "left_rear_leg", "left_front_leg", "right_rear_leg", "right_front_leg"
         ]
         self.nominal_foot_offsets = {
             "left_front_leg": np.array([0.12, 0.1, 0.038]),
@@ -53,6 +53,7 @@ class Walker():
             "left_rear_leg": np.array([-0.175, 0.1, 0.038]),
             "right_rear_leg": np.array([-0.175, -0.1, 0.038]),
         }
+        self.com_shift_frac = com_shift_frac
         self.com_slew_size = com_slew_size
         self.foot_slew_size = foot_slew_size
         self.forward_step_size = forward_step_size
@@ -79,12 +80,15 @@ class Walker():
         target_foot = self.foot_ordering[self.curr_foot_k]
         self.curr_foot_k = (self.curr_foot_k + 1) % 4
 
-        # Move COM to center of the stance feet.
+        # Move COM towards center of the stance feet.
         com_target = np.stack([
             v for k, v in self.curr_feet_positions.items() if k != target_foot
         ]).mean(axis=0)
+        rospy.loginfo("Feet pos: %s", self.curr_feet_positions)
+        rospy.loginfo("COM target: %s", com_target)
         # Keep original com height
         com_target[2] = self.com_height # self.curr_robot_state[2]
+        com_target = com_target * (self.com_shift_frac) + self.curr_robot_state[:3] * (1. - self.com_shift_frac)
         if not self.move_com_to(com_target):
             rospy.logwarn("Couldn't move COM all the way.")
             # Keep going in case we can still make it partway.
@@ -109,6 +113,15 @@ class Walker():
         if not self.move_foot_to(target_foot, drop_pos, end_in_support=True):
             rospy.logerr("Couldn't drop foot completely.")
             return False
+
+        # Recenter COM
+        com_target = np.stack([
+            v for k, v in self.curr_feet_positions.items()
+        ]).mean(axis=0)
+        com_target[2] = self.com_height
+        if not self.move_com_to(com_target):
+            rospy.logwarn("Couldn't move COM all the way.")
+            # Keep going in case we can still make it partway.
 
         # Done!
         return True

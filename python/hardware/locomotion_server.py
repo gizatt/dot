@@ -192,7 +192,7 @@ class LocomotionManager():
         self.status_pub.publish(status_msg)
 
     @staticmethod    
-    def is_stable_configuration(com_xyz, feet_positions, stance_status, contract_amount=0.33):
+    def is_stable_configuration(com_xyz, feet_positions, stance_status, contract_amount=0.0):
         # Create 3 x N matrices of the active and inactive (support / non-support) feet positions.
         active_feet = np.array([feet_positions[key] for key, value in stance_status.items() if value]).T.reshape(3, -1)
         inactive_feet = np.array([feet_positions[key] for key, value in stance_status.items() if not value]).T.reshape(3, -1)
