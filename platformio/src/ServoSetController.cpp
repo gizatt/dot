@@ -2,11 +2,12 @@
 #include "ServoSetController.hpp"
 #include "DebugStrPublisher.hpp"
 
-bool PiecewiseTrajectory::SetFromMsg(const dot_msgs::ServoSetTrajectory &msg)
+bool PiecewiseTrajectory::SetFromMsg(const dot_msgs::ServoSetTrajectory &msg, PiecewiseTrajectory::T *q0)
 {
     // Reject trajectory if it doesn't pass sanity checks;
     // otherwise copy it over.
-    if (msg.num_breaks >= MAX_TRAJECTORY_LENGTH)
+    // We save a slot in our buffer for adding q0 if present, hence the -1.
+    if (msg.num_breaks >= MAX_TRAJECTORY_LENGTH - 1)
     {
         if (m_debug_publisher)
             m_debug_publisher->logerror("Rejecting trajectory with too many points: %u vs limit %u.", msg.num_breaks, MAX_TRAJECTORY_LENGTH);
@@ -46,16 +47,28 @@ bool PiecewiseTrajectory::SetFromMsg(const dot_msgs::ServoSetTrajectory &msg)
     }
     // Copy data over into our internal buffer for the piecewise trajectory.
     double start_time = msg.header.stamp.toSec();
-    for (unsigned int i = 0; i < msg.num_breaks; i++)
+    int i_shift = 0;
+    if (msg.breaks_from_start[0] > 0. && q0)
     {
-        m_breaks[i] = start_time + msg.breaks_from_start[i];
+        // First, insert q0 as a ghost first break at t0.
+        m_breaks[0] = start_time;
         for (unsigned int j = 0; j < msg.num_positions; j++)
         {
             // Convert from uint16 to float.
-            m_data[i * NUM_POSITIONS + j] = msg.data[i * NUM_POSITIONS + j];
+            m_data[j] = q0[j];
+        }
+        i_shift = 1;
+    }
+    for (unsigned int i = 0; i < msg.num_breaks; i++)
+    {
+        m_breaks[i + i_shift] = start_time + msg.breaks_from_start[i];
+        for (unsigned int j = 0; j < msg.num_positions; j++)
+        {
+            // Convert from uint16 to float.
+            m_data[(i + i_shift) * NUM_POSITIONS + j] = msg.data[i * NUM_POSITIONS + j];
         }
     }
-    m_num_breaks = msg.num_breaks;
+    m_num_breaks = msg.num_breaks + i_shift;
     return true;
 }
 
@@ -125,7 +138,15 @@ void ServoSetController::trajectory_msg_callback(
 {
     if (m_debug_publisher)
         m_debug_publisher->logdebug("Got message with delay %f.", m_nh.now().toSec() - msg.header.stamp.toSec());
-    m_commanded_trajectory.SetFromMsg(msg);
+    // Use a hacky proxy for whether we've commanded a reasonable position.
+    if (m_last_command.position[0] > 100)
+    {
+        m_commanded_trajectory.SetFromMsg(msg, m_last_command.position);
+    }
+    else
+    {
+        m_commanded_trajectory.SetFromMsg(msg);
+    }
 }
 
 ServoSetController::ServoSetController(ros::NodeHandle &nh, DebugStrPublisher *debug_publisher) : m_nh(nh),

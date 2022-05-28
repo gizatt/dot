@@ -22,7 +22,12 @@ public:
     const static unsigned int MAX_TRAJECTORY_LENGTH = 30;
 
     PiecewiseTrajectory(ros::NodeHandle &nh, DebugStrPublisher *debug_publisher = nullptr) : m_nh(nh), m_debug_publisher(debug_publisher), m_num_breaks(0) {}
-    bool SetFromMsg(const dot_msgs::ServoSetTrajectory &msg);
+    /*
+     * Populate this trajectory from a message. If q0 is not null, then it should be a NUM_POSITIONS
+     * array of scalars that are used as the pose at knot 0 if a break at time 0 is *not*
+     * provided in the message. (This allows natural slewing from current commanded posture.)
+     */
+    bool SetFromMsg(const dot_msgs::ServoSetTrajectory &msg, PiecewiseTrajectory::T *q0 = nullptr);
     unsigned int get_num_breaks() { return m_num_breaks; }
     void get_command_at_time(double t, T *output_buffer);
 

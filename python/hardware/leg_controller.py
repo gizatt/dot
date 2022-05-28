@@ -134,17 +134,18 @@ class HardwareInterface():
             q[q_inds] = leg.convert_us_to_pose(us[us_inds])
         return q
 
-    def send_pose(self, q, allow_projection=True):
+    def send_pose(self, q, allow_projection=True, slew_time=0.):
         assert q.shape == (12,)
         us_candidate, required_projection = self.convert_pose_to_us(q)
         if allow_projection is False and required_projection is True:
             return False
-        self.send_us(us_candidate)
+        self.send_us(us_candidate, slew_time=slew_time)
         return True
 
-    def send_us(self, us):
+    def send_us(self, us, slew_time=0.):
         ''' WARNING: NO SANITY CHECKING! '''
         assert us.shape == (16,)
+
         self.curr_us = us
         self.curr_pose = self.convert_us_to_pose(us)
     
@@ -155,8 +156,9 @@ class HardwareInterface():
         trajectory_msg.num_positions = nq
         trajectory_msg.num_breaks = nb
         data = np.zeros((nb, nq), dtype=np.int16) - 1
-        data[0, :] = us
-        trajectory_msg.breaks_from_start = [0.]
+        data[-1, :] = us
+        breaks_from_start = [slew_time]
+        trajectory_msg.breaks_from_start = breaks_from_start
         trajectory_msg.data = data.flatten().tolist()    
         self.pub.publish(trajectory_msg)
 

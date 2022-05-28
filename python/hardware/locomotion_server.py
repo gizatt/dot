@@ -146,9 +146,9 @@ class LocomotionManager():
         # Finally create leg interface driver and try to send initial state.
         self.leg_interface = HardwareInterface(self.joint_q, self.servo_configs)
         assert self.leg_interface.send_pose(self.joint_q, allow_projection=False)
-        self.command_timer = rospy.Timer(
-            rospy.Duration(self.command_publish_period), self.publish_command
-        )
+        #self.command_timer = rospy.Timer(
+        #    rospy.Duration(self.command_publish_period), self.publish_command
+        #)
 
     def do_ik_for_feet_and_com(self, feet_positions, com_xyz, com_rpy=np.zeros(3)):
         q = np.zeros(12)
@@ -239,7 +239,7 @@ class LocomotionManager():
             rep.info = "Desired COM failed IK: probably too far."
             return rep
         
-        success = self.leg_interface.send_pose(q, allow_projection=False)
+        success = self.leg_interface.send_pose(q, allow_projection=False, slew_time=0.2)
         if not success:
             rospy.loginfo("\tFailed due to servo constraints.")
             rep.success = Bool(False)
@@ -293,7 +293,7 @@ class LocomotionManager():
             rep.info = "New foot position failed IK."
             return rep
         
-        success = self.leg_interface.send_pose(q, allow_projection=False)
+        success = self.leg_interface.send_pose(q, allow_projection=False, slew_time=0.1)
 
         if not success:
             rospy.loginfo("\tFailed due to servo constraints.")
