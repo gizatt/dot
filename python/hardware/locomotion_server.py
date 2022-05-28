@@ -5,6 +5,8 @@ from ik import single_leg_forward_kin
 import yaml
 import time
 from scipy.optimize import linprog
+import scipy
+import scipy.spatial
 import numpy as np
 
 import rospy
@@ -148,11 +150,14 @@ class LocomotionManager():
             rospy.Duration(self.command_publish_period), self.publish_command
         )
 
-    def do_ik_for_feet_and_com(self, feet_positions, com):
+    def do_ik_for_feet_and_com(self, feet_positions, com_xyz, com_rpy=np.zeros(3)):
         q = np.zeros(12)
+        # Hips should be in a plane that intersects com_xyz, and is rotated
+        # by this RPY.
+        R = sp.spatial.transform.Rotation.from_euler("xyz", com_rpy).as_matrix()
         for f in self.leg_names:
             assert f in feet_positions.keys()
-            q_part = do_ik(feet_positions[f], self.hip_positions[f][0] + com[:3], self.hip_positions[f][1])
+            q_part = do_ik(feet_positions[f], R.dot(self.hip_positions[f][0]) + com_xyz[:3], self.hip_positions[f][1])
             if q_part is False:
                 return False
             for k, key in enumerate(["hip_abduct_info", "hip_pitch_info", "knee_pitch_info"]):
@@ -213,12 +218,13 @@ class LocomotionManager():
     def handle_move_com(self, req):
         rep = MoveComResponse()
         
-        rospy.loginfo("Req to move com to [%f, %f, %f]" % (req.desired_xyz.x, req.desired_xyz.y, req.desired_xyz.z))
+        rospy.loginfo("Req to move com to [%f, %f, %f, %f, %f, %f]" % (req.desired_xyz.x, req.desired_xyz.y, req.desired_xyz.z, req.desired_rpy.x, req.desired_rpy.y, req.desired_rpy.z))
 
         # Test if the desired COM is in the support polygon
         # of the current feet.
-        desired_com = np.array([req.desired_xyz.x, req.desired_xyz.y, req.desired_xyz.z])
-        feasible = self.is_stable_configuration(desired_com, self.feet_positions, self.stance_status)
+        desired_com_xyz = np.array([req.desired_xyz.x, req.desired_xyz.y, req.desired_xyz.z])
+        desired_com_rpy = np.array([req.desired_rpy.x, req.desired_rpy.y, req.desired_rpy.z])
+        feasible = self.is_stable_configuration(desired_com_xyz, self.feet_positions, self.stance_status)
         if not feasible:
             rospy.loginfo("\tFailed due to COM feasibility.")
             rep.success = Bool(False)
@@ -226,7 +232,7 @@ class LocomotionManager():
             return rep
 
         # It's feasible, so try to do IK for it.
-        q = self.do_ik_for_feet_and_com(self.feet_positions, desired_com)
+        q = self.do_ik_for_feet_and_com(self.feet_positions, desired_com_xyz, desired_com_rpy)
         if q is False:
             rospy.loginfo("\tFailed due to IK feasibility.")
             rep.success = Bool(False)
@@ -242,7 +248,8 @@ class LocomotionManager():
         
         # Commit changes to state.
         rospy.loginfo("\tSucceeded.")
-        self.com_q[:3] = desired_com
+        self.com_q[:3] = desired_com_xyz
+        self.com_q[3:] = desired_com_rpy
         self.joint_q = q
 
         rep.success = Bool(True)
